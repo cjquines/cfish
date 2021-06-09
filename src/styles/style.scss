@@ -1,3 +1,68 @@
-body {
-  font-size: 25px;
+.wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.game {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+
+.table {
+  min-height: 20rem;
+  margin: 3rem 0 6rem;
+  position: relative;
+
+  .players {
+    background-color: #eee;
+    border-radius: 50%;
+    height: 20rem;
+    padding: 0;
+    position: relative;
+    width: 20rem;
+
+    > * {
+      background-color: #ddd;
+      display: block;
+      height: 5rem;
+      left: 50%;
+      margin: -2.5rem;
+      position: absolute;
+      top: 50%;
+      width: 5rem;
+
+      $rot: 90;
+      @for $i from 1 through 6 {
+        &:nth-of-type(#{$i}) {
+          transform: rotate($rot * 1deg) translate(10rem) rotate($rot * -1deg);
+        }
+        $rot: $rot + 60;
+      }
+    }
+  }
+
+  .question {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: rotate(60deg) translate(5rem) rotate(-90deg);
+  }
+}
+
+.hand {
+  min-height: 10rem;
+
+  .cardarea {
+    display: flex;
+
+    > * {
+      background-color: #ddd;
+      display: block;
+      height: 5rem;
+      margin: 0 0.5rem;
+      width: 3.5rem;
+    }
+  }
 }
