@@ -1,6 +1,7 @@
 import React from "react";
-import { ArcherContainer, ArcherElement } from "react-archer";
 import { hot } from "react-hot-loader/root";
+
+import { Question } from "components/Question";
 
 import "styles/style.scss";
 
@@ -29,33 +30,7 @@ const App = () => {
               <div className="playerInt">Player 6</div>
             </div>
           </div>
-          <div className="question">
-            <ArcherContainer strokeColor="black">
-              <div className="playerTarget">
-                <ArcherElement
-                  id="p1"
-                  relations={[
-                    {
-                      targetId: "p2",
-                      targetAnchor: "middle",
-                      sourceAnchor: "middle",
-                    },
-                  ]}
-                >
-                  <div className="playerTargetInt"></div>
-                </ArcherElement>
-              </div>
-              <div className="playerTarget">
-                <ArcherElement id="p2">
-                  <div className="playerTargetInt"></div>
-                </ArcherElement>
-              </div>
-              <div className="playerTarget"></div>
-              <div className="playerTarget"></div>
-              <div className="playerTarget"></div>
-              <div className="playerTarget"></div>
-            </ArcherContainer>
-          </div>
+          <Question from="p1" to="p6" label="3S" />
         </div>
         <div className="hand">
           <div className="cardarea">
