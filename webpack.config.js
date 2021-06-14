@@ -41,6 +41,7 @@ module.exports = {
         enforce: "pre",
         test: /\.js$/,
         loader: "source-map-loader",
+        exclude: /node_modules/,
       },
       {
         test: /\.(js|jsx)$/,
@@ -64,6 +65,6 @@ module.exports = {
   ].filter(Boolean),
   resolve: {
     extensions: [".js", ".ts", ".tsx"],
-    modules: ["node_modules", path.join(__dirname, "src")]
+    modules: ["node_modules", path.join(__dirname, "src")],
   },
 };
