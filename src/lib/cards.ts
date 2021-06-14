@@ -1,21 +1,59 @@
 export enum CardSuit {
-  CLUBS = "♣",
-  DIAMONDS = "♦",
-  SPADES = "♠",
-  HEARTS = "♥",
-  JOKER = "Joker",
+  CLUBS,
+  DIAMONDS,
+  SPADES,
+  HEARTS,
+  JOKER,
+}
+
+export function cardSuitToString(cardSuit: CardSuit): string {
+  switch (cardSuit) {
+    case CardSuit.CLUBS:
+      return "♣";
+    case CardSuit.DIAMONDS:
+      return "♦";
+    case CardSuit.SPADES:
+      return "♠";
+    case CardSuit.HEARTS:
+      return "♥";
+    case CardSuit.JOKER:
+      return "Joker";
+  }
 }
 
 export enum FishSuit {
-  LOW_CLUBS = "Low ♣",
-  HIGH_CLUBS = "High ♣",
-  LOW_DIAMONDS = "Low ♦",
-  HIGH_DIAMONDS = "High ♦",
-  LOW_SPADES = "Low ♠",
-  HIGH_SPADES = "High ♠",
-  LOW_HEARTS = "Low ♥",
-  HIGH_HEARTS = "High ♥",
-  EIGHTS = "Eights",
+  LOW_CLUBS,
+  HIGH_CLUBS,
+  LOW_DIAMONDS,
+  HIGH_DIAMONDS,
+  LOW_SPADES,
+  HIGH_SPADES,
+  LOW_HEARTS,
+  HIGH_HEARTS,
+  EIGHTS,
+}
+
+export function fishSuitToString(fishSuit: FishSuit): string {
+  switch (fishSuit) {
+    case FishSuit.LOW_CLUBS:
+      return "Low ♣";
+    case FishSuit.HIGH_CLUBS:
+      return "High ♣";
+    case FishSuit.LOW_DIAMONDS:
+      return "Low ♦";
+    case FishSuit.HIGH_DIAMONDS:
+      return "High ♦";
+    case FishSuit.LOW_SPADES:
+      return "Low ♠";
+    case FishSuit.HIGH_SPADES:
+      return "High ♠";
+    case FishSuit.LOW_HEARTS:
+      return "Low ♥";
+    case FishSuit.HIGH_HEARTS:
+      return "High ♥";
+    case FishSuit.EIGHTS:
+      return "Eights";
+  }
 }
 
 export enum Rank {
@@ -83,6 +121,36 @@ export class Card {
   }
 
   toString(): string {
-    return rankToString(this.rank) + String(this.cardSuit);
+    return rankToString(this.rank) + cardSuitToString(this.cardSuit);
+  }
+}
+
+export class Hand {
+  private cards: Card[];
+
+  constructor(cards: Iterable<Card>) {
+    for (let card of cards) this.insert(card);
+  }
+
+  get size(): number {
+    return this.cards.length;
+  }
+
+  includes(card: Card): boolean {
+    return this.cards.includes(card);
+  }
+
+  insert(card: Card): void {
+    this.cards.push(card);
+  }
+
+  remove(card: Card): void {
+    const idx = this.cards.indexOf(card);
+    console.assert(idx !== -1);
+    this.cards.splice(idx);
+  }
+
+  hasSuit(fishSuit: FishSuit): boolean {
+    return this.cards.some((card) => card.fishSuit === fishSuit);
   }
 }
