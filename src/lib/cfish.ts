@@ -1,3 +1,5 @@
+import assert from "assert/strict";
+
 import { Card, FishSuit, Hand } from "lib/cards";
 
 // socket io id
@@ -97,23 +99,23 @@ export class Engine extends Data {
   // protocol actions
 
   addUser(user: UserID): void {
-    console.assert(!this.users.has(user));
+    assert.strictEqual(this.users.has(user), false);
     this.users.add(user);
   }
 
   seatAt(user: UserID, seat: SeatID): void {
-    console.assert(this.users.has(user));
-    console.assert(this.userOf[seat] === null);
+    assert.strictEqual(this.users.has(user), true);
+    assert.strictEqual(this.userOf[seat], null);
     this.userOf[seat] = user;
   }
 
   unseatAt(seat: SeatID): void {
-    console.assert(this.userOf[seat] !== null);
+    assert.notStrictEqual(this.userOf[seat], null);
     this.userOf[seat] = null;
   }
 
   removeUser(user: UserID): void {
-    console.assert(this.users.has(user));
+    assert.strictEqual(this.users.has(user), true);
     const seat = this.seatOf(user);
     if (seat !== null) this.unseatAt(seat);
     if (user === this.host) {

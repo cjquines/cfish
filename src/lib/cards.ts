@@ -1,3 +1,5 @@
+import assert from "assert/strict";
+
 export enum CardSuit {
   CLUBS,
   DIAMONDS,
@@ -96,7 +98,7 @@ export class Card {
   readonly fishSuit: FishSuit;
 
   constructor(readonly cardSuit: CardSuit, readonly rank: Rank) {
-    console.assert(Card.validate(cardSuit, rank));
+    assert.strictEqual(Card.validate(cardSuit, rank), true);
     this.fishSuit = Card.fishSuit(cardSuit, rank);
   }
 
@@ -146,7 +148,7 @@ export class Hand {
 
   remove(card: Card): void {
     const idx = this.cards.indexOf(card);
-    console.assert(idx !== -1);
+    assert.notStrictEqual(idx, -1);
     this.cards.splice(idx);
   }
 
