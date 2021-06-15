@@ -22,16 +22,18 @@ export namespace CFish {
 
 export class Data {
   phase: CFish.Phase = CFish.Phase.WAIT;
-  // whose data is this? null is global
-  identity: PlayerID | null = null;
-
+  // all users in the room
+  users: Set<UserID> = new Set();
+  // whose data is this? null is server
+  identity: UserID | null = null;
   host: UserID | null = null;
+
   // players 0, 1, 2, etc. are host clockwise
-  // disconnected players are null
-  // even-indexed players are in CFish.Team.FIRST
   players: PlayerID[] = [];
-  users: Record<PlayerID, UserID | null> = {} as any;
-  declaredSuits: Record<FishSuit, CFish.Team> = {} as any;
+  // map player to the user seated in that spot
+  // even-indexed seats are in CFish.Team.FIRST
+  seated: Record<PlayerID, UserID | null> = {} as any;
+  declarations: Record<FishSuit, CFish.Team> = {} as any;
 
   // these are index-dependent and player-agnostic
   // hands (maps to null for users != identity)
@@ -52,25 +54,32 @@ export class Data {
   declaredSuit: FishSuit | null = null;
 }
 
-export class Game extends Data {
+// client/server agnostic cfish engine
+// client and server use the same state machine
+// upon connect server pushes all state info to client engine
+// client sends action to client engine and server
+// server sends action to server engine and clients
+
+export class Engine extends Data {
   constructor(readonly numPlayers: number) {
     super();
     this.players = [...Array(numPlayers).keys()];
     this.players.forEach((id) => {
-      this.users[id] = null;
+      this.seated[id] = null;
       this.hand[id] = null;
       this.handSize[id] = 0;
     });
   }
 
-  indexOf(user: UserID): PlayerID {
-    const res = this.players.filter((id) => this.users[id] === user);
-    console.assert(res.length === 1);
-    return res[0];
+  indexOf(user: UserID): PlayerID | null {
+    const res = this.players.filter((id) => this.seated[id] === user);
+    return res.length === 1 ? res[0] : null;
   }
 
-  teamOf(user: UserID): CFish.Team {
-    return this.indexOf(user) % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
+  teamOf(user: UserID): CFish.Team | null {
+    const idx = this.indexOf(user);
+    if (idx === null) return null;
+    return idx % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
   }
 
   playersOf(team: CFish.Team): PlayerID[] {
@@ -79,28 +88,23 @@ export class Game extends Data {
 
   // rotate such that identity appears first
   rotatedPlayers(): PlayerID[] {
-    let res = this.players.slice();
-    if (this.identity !== null)
-      while (res[0] !== this.identity) res.push(res.shift());
-    return res;
-  }
-
-  // returns player to take next action, sensitive to phase
-  currentPlayer(): PlayerID | null {
-    return null;
+    const idx = this.indexOf(this.identity);
+    if (idx === null) return this.players;
+    return this.players.slice(idx).concat(this.players.slice(0, idx));
   }
 
   // state machine begins here
 
-  // WAIT -> WAIT: addPlayer
-  // WAIT -> WAIT: removePlayer
-  // WAIT -> ASK: startGame
-  // ASK -> ANSWER: ask
-  // ANSWER -> ASK: answer
-  // ASK -> DECLARE: initDeclare
-  // DECLARE -> ASK / FINISH: declare
-  // FINISH -> WAIT: newGame
-}
+  // ANY -> ANY: addUser(UserID)
+  // ANY -> ANY: removeUser(UserID)
+  // ANY -> ANY: seatAt(UserID, PlayerID)
+  // ANY -> ANY: unseatAt(PlayerID)
 
-export type State = Game;
-export type PlayerState = Game;
+  // first argument is always player initiating action
+  // WAIT -> ASK: startGame(player: PlayerID)
+  // ASK -> ANSWER: ask(asker: PlayerID, askee: PlayerID, Card)
+  // ANSWER -> ASK: answer(askee: PlayerID, boolean)
+  // ASK -> DECLARE: initDeclare(player: PlayerID)
+  // DECLARE -> ASK / FINISH: declare(player: PlayerID, Record<Card, PlayerID>)
+  // FINISH -> WAIT: newGame(player: PlayerID)
+}
