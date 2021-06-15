@@ -71,6 +71,9 @@ export class Engine extends Data {
     });
   }
 
+  // getters
+
+  // seatOf? PlayerID -> SeatID?
   indexOf(user: UserID): PlayerID | null {
     const res = this.players.filter((id) => this.seated[id] === user);
     return res.length === 1 ? res[0] : null;
@@ -86,25 +89,53 @@ export class Engine extends Data {
     return this.players.filter((id) => id % 2 === Number(team));
   }
 
-  // rotate such that identity appears first
+  // rotated such that identity appears first
   rotatedPlayers(): PlayerID[] {
     const idx = this.indexOf(this.identity);
     if (idx === null) return this.players;
     return this.players.slice(idx).concat(this.players.slice(0, idx));
   }
 
+  // protocol actions
+
+  addUser(user: UserID): void {
+    console.assert(!this.users.has(user));
+    this.users.add(user);
+  }
+
+  seatAt(user: UserID, player: PlayerID): void {
+    console.assert(this.users.has(user));
+    console.assert(this.seated[player] === null);
+    this.seated[player] = user;
+  }
+
+  unseatAt(player: PlayerID): void {
+    console.assert(this.seated[player] !== null);
+    this.seated[player] = null;
+  }
+
+  removeUser(user: UserID): void {
+    console.assert(this.users.has(user));
+    const seat = this.indexOf(user);
+    if (seat !== null) this.unseatAt(seat);
+    if (user === this.host) {
+      let found = false;
+      this.players.forEach((id) => {
+        if (!found && this.seated[id] !== null) {
+          this.host = this.seated[id];
+          found = true;
+        }
+      });
+      if (!found) this.host = null;
+    }
+  }
+
   // state machine begins here
-
-  // ANY -> ANY: addUser(UserID)
-  // ANY -> ANY: removeUser(UserID)
-  // ANY -> ANY: seatAt(UserID, PlayerID)
-  // ANY -> ANY: unseatAt(PlayerID)
-
   // first argument is always player initiating action
-  // WAIT -> ASK: startGame(player: PlayerID)
+  // WAIT -> ASK: startGame(host: PlayerID)
   // ASK -> ANSWER: ask(asker: PlayerID, askee: PlayerID, Card)
   // ANSWER -> ASK: answer(askee: PlayerID, boolean)
-  // ASK -> DECLARE: initDeclare(player: PlayerID)
-  // DECLARE -> ASK / FINISH: declare(player: PlayerID, Record<Card, PlayerID>)
-  // FINISH -> WAIT: newGame(player: PlayerID)
+  // ASK -> DECLARE: initDeclare(declarer: PlayerID)
+  // DECLARE -> ASK / FINISH: declare(declarer: PlayerID, Record<Card, PlayerID>)
+  // FINISH -> WAIT: newGame(host: PlayerID)
 }
