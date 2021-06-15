@@ -2,10 +2,8 @@ import assert from "assert/strict";
 
 import { Card, FishSuit, Hand } from "lib/cards";
 
-// socket io id
-export type UserID = string;
-// seat index (0, 1, 2, ...)
-export type SeatID = number;
+export type UserID = string; // socket io id
+export type SeatID = number; // seat index (0, 1, 2, ...)
 
 export namespace CFish {
   export enum Phase {
@@ -43,7 +41,7 @@ export class Data {
   handSize: Record<SeatID, number> = {} as any;
 
   // asker asks askedCard from askee
-  // asker valid if phase is ASK / ANSWER
+  // asker valid if phase is ASK / ANSWER / DECLARE
   asker: SeatID | null = null;
   // askee, askedCard valid if phase is ANSWER
   askee: SeatID | null = null;
@@ -74,6 +72,10 @@ export class Engine extends Data {
 
   // getters
 
+  numSeated(): number {
+    return this.seats.filter((seat) => this.userOf[seat] !== null).length;
+  }
+
   seatOf(user: UserID): SeatID | null {
     const res = this.seats.filter((seat) => this.userOf[seat] === user);
     return res.length === 1 ? res[0] : null;
@@ -88,6 +90,8 @@ export class Engine extends Data {
   playersOf(team: CFish.Team): SeatID[] {
     return this.seats.filter((seat) => seat % 2 === Number(team));
   }
+
+  // scoreOf(team: CFish.Team): number
 
   // rotated such that user appears first
   rotatedSeats(user: UserID = this.identity): SeatID[] {
@@ -123,6 +127,7 @@ export class Engine extends Data {
       this.seats.forEach((seat) => {
         if (!found && this.userOf[seat] !== null) {
           this.host = this.userOf[seat];
+          // ensure seats[0] is host
           this.seats = this.rotatedSeats(this.host);
           found = true;
         }
@@ -131,12 +136,61 @@ export class Engine extends Data {
     }
   }
 
-  // state machine begins here
-  // first argument is always player initiating action
-  // WAIT -> ASK: startGame(host: SeatID)
-  // ASK -> ANSWER: ask(asker: SeatID, askee: SeatID, Card)
-  // ANSWER -> ASK: answer(askee: SeatID, boolean)
-  // ASK -> DECLARE: initDeclare(declarer: SeatID)
-  // DECLARE -> ASK / FINISH: declare(declarer: SeatID, Record<Card, SeatID>)
-  // FINISH -> WAIT: newGame(host: SeatID)
+  // state machine actions
+  // first argument is always seat initiating
+
+  // WAIT -> ASK
+  startGame(seat: SeatID): void {
+    assert.strictEqual(this.phase, CFish.Phase.WAIT);
+    assert.strictEqual(this.userOf[seat], this.host);
+    assert.strictEqual(this.numSeated, this.numPlayers);
+    // shuffle and deal cards
+    // clear declared suits
+    // clear asker, etc.
+    // set asker
+    this.phase = CFish.Phase.ASK;
+  }
+
+  // ASK -> ANSWER
+  ask(asker: SeatID, askee: SeatID, card: Card): void {
+    assert.strictEqual(this.phase, CFish.Phase.ASK);
+    assert.strictEqual(this.asker, asker);
+    // check if valid ask if we can
+    // set askee, card
+    this.phase = CFish.Phase.ANSWER;
+  }
+
+  // ANSWER -> ASK
+  answer(askee: SeatID, response: boolean): void {
+    assert.strictEqual(this.phase, CFish.Phase.ANSWER);
+    assert.strictEqual(this.askee, askee);
+    // check response correct if we can
+    // unset askee, card
+    // set asker
+    this.phase = CFish.Phase.ASK;
+  }
+
+  // ASK -> DECLARE
+  initDeclare(declarer: SeatID, declaredSuit: FishSuit): void {
+    assert.strictEqual(this.phase, CFish.Phase.ASK);
+    // check suit isn't declared yet
+    // set declarer, declaredSuit
+    this.phase = CFish.Phase.DECLARE;
+  }
+
+  // DECLARE -> ASK / FINISH
+  declare(declarer: SeatID, owners: Record<string, SeatID>): void {
+    assert.strictEqual(this.phase, CFish.Phase.DECLARE);
+    assert.strictEqual(this.declarer, declarer);
+    // check owners keys are all good
+    // check owners seats are all team
+    // check if correct or not
+    // add to declared suits
+    // if a team has majority declared suits, move to finish
+    // otherwise move back to asker
+  }
+
+  // FINISH -> WAIT
+  // newGame(host: SeatID): void
+  // just do a phase change?
 }
