@@ -2,8 +2,8 @@ import { Card, FishSuit, Hand } from "lib/cards";
 
 // socket io id
 export type UserID = string;
-// player index (0, 1, 2, ...)
-export type PlayerID = number;
+// seat index (0, 1, 2, ...)
+export type SeatID = number;
 
 export namespace CFish {
   export enum Phase {
@@ -28,29 +28,28 @@ export class Data {
   identity: UserID | null = null;
   host: UserID | null = null;
 
-  // players 0, 1, 2, etc. are host clockwise
-  players: PlayerID[] = [];
-  // map player to the user seated in that spot
+  // seats, clockwise; seats[0] should always be host
   // even-indexed seats are in CFish.Team.FIRST
-  seated: Record<PlayerID, UserID | null> = {} as any;
-  declarations: Record<FishSuit, CFish.Team> = {} as any;
+  seats: SeatID[] = [];
+  userOf: Record<SeatID, UserID | null> = {} as any;
+  declared: Record<FishSuit, CFish.Team> = {} as any;
 
   // these are index-dependent and player-agnostic
-  // hands (maps to null for users != identity)
-  hand: Record<PlayerID, Hand | null> = {} as any;
-  // hand size (because hands aren't public)
-  handSize: Record<PlayerID, number> = {} as any;
+  // hands; maps to null for private hands
+  handOf: Record<SeatID, Hand | null> = {} as any;
+  // hand size; always public
+  handSize: Record<SeatID, number> = {} as any;
 
   // asker asks askedCard from askee
   // asker valid if phase is ASK / ANSWER
-  asker: PlayerID | null = null;
+  asker: SeatID | null = null;
   // askee, askedCard valid if phase is ANSWER
-  askee: PlayerID | null = null;
+  askee: SeatID | null = null;
   askedCard: Card | null = null;
 
   // declarer declares declaredSuit
   // valid if phase is DECLARE
-  declarer: PlayerID | null = null;
+  declarer: SeatID | null = null;
   declaredSuit: FishSuit | null = null;
 }
 
@@ -63,37 +62,36 @@ export class Data {
 export class Engine extends Data {
   constructor(readonly numPlayers: number) {
     super();
-    this.players = [...Array(numPlayers).keys()];
-    this.players.forEach((id) => {
-      this.seated[id] = null;
-      this.hand[id] = null;
-      this.handSize[id] = 0;
+    this.seats = [...Array(numPlayers).keys()];
+    this.seats.forEach((seat) => {
+      this.userOf[seat] = null;
+      this.handOf[seat] = null;
+      this.handSize[seat] = 0;
     });
   }
 
   // getters
 
-  // seatOf? PlayerID -> SeatID?
-  indexOf(user: UserID): PlayerID | null {
-    const res = this.players.filter((id) => this.seated[id] === user);
+  seatOf(user: UserID): SeatID | null {
+    const res = this.seats.filter((seat) => this.userOf[seat] === user);
     return res.length === 1 ? res[0] : null;
   }
 
   teamOf(user: UserID): CFish.Team | null {
-    const idx = this.indexOf(user);
-    if (idx === null) return null;
-    return idx % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
+    const seat = this.seatOf(user);
+    if (seat === null) return null;
+    return seat % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
   }
 
-  playersOf(team: CFish.Team): PlayerID[] {
-    return this.players.filter((id) => id % 2 === Number(team));
+  playersOf(team: CFish.Team): SeatID[] {
+    return this.seats.filter((seat) => seat % 2 === Number(team));
   }
 
-  // rotated such that identity appears first
-  rotatedPlayers(): PlayerID[] {
-    const idx = this.indexOf(this.identity);
-    if (idx === null) return this.players;
-    return this.players.slice(idx).concat(this.players.slice(0, idx));
+  // rotated such that user appears first
+  rotatedSeats(user: UserID = this.identity): SeatID[] {
+    const seat = this.seatOf(user);
+    if (seat === null) return this.seats;
+    return this.seats.slice(seat).concat(this.seats.slice(0, seat));
   }
 
   // protocol actions
@@ -103,26 +101,27 @@ export class Engine extends Data {
     this.users.add(user);
   }
 
-  seatAt(user: UserID, player: PlayerID): void {
+  seatAt(user: UserID, seat: SeatID): void {
     console.assert(this.users.has(user));
-    console.assert(this.seated[player] === null);
-    this.seated[player] = user;
+    console.assert(this.userOf[seat] === null);
+    this.userOf[seat] = user;
   }
 
-  unseatAt(player: PlayerID): void {
-    console.assert(this.seated[player] !== null);
-    this.seated[player] = null;
+  unseatAt(seat: SeatID): void {
+    console.assert(this.userOf[seat] !== null);
+    this.userOf[seat] = null;
   }
 
   removeUser(user: UserID): void {
     console.assert(this.users.has(user));
-    const seat = this.indexOf(user);
+    const seat = this.seatOf(user);
     if (seat !== null) this.unseatAt(seat);
     if (user === this.host) {
       let found = false;
-      this.players.forEach((id) => {
-        if (!found && this.seated[id] !== null) {
-          this.host = this.seated[id];
+      this.seats.forEach((seat) => {
+        if (!found && this.userOf[seat] !== null) {
+          this.host = this.userOf[seat];
+          this.seats = this.rotatedSeats(this.host);
           found = true;
         }
       });
@@ -132,10 +131,10 @@ export class Engine extends Data {
 
   // state machine begins here
   // first argument is always player initiating action
-  // WAIT -> ASK: startGame(host: PlayerID)
-  // ASK -> ANSWER: ask(asker: PlayerID, askee: PlayerID, Card)
-  // ANSWER -> ASK: answer(askee: PlayerID, boolean)
-  // ASK -> DECLARE: initDeclare(declarer: PlayerID)
-  // DECLARE -> ASK / FINISH: declare(declarer: PlayerID, Record<Card, PlayerID>)
-  // FINISH -> WAIT: newGame(host: PlayerID)
+  // WAIT -> ASK: startGame(host: SeatID)
+  // ASK -> ANSWER: ask(asker: SeatID, askee: SeatID, Card)
+  // ANSWER -> ASK: answer(askee: SeatID, boolean)
+  // ASK -> DECLARE: initDeclare(declarer: SeatID)
+  // DECLARE -> ASK / FINISH: declare(declarer: SeatID, Record<Card, SeatID>)
+  // FINISH -> WAIT: newGame(host: SeatID)
 }
