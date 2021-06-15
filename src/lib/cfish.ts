@@ -1,11 +1,9 @@
 import { Card, FishSuit, Hand } from "lib/cards";
 
-// okay indices are good but this should be generic length not 6
-// because what if 8 player games?
-type Tuple6<T> = [T, T, T, T, T, T];
-
 // socket io id
 export type UserID = string;
+// player index (0, 1, 2, ...)
+export type PlayerID = number;
 
 export namespace CFish {
   export enum Phase {
@@ -17,59 +15,78 @@ export namespace CFish {
   }
 
   export enum Team {
-    FIRST, // goes first
+    FIRST = 0, // goes first
     SECOND,
   }
 }
 
 export class Data {
-  // game phase
   phase: CFish.Phase = CFish.Phase.WAIT;
-  // whose data is this?
-  identity: UserID | null = null;
+  // whose data is this? null is global
+  identity: PlayerID | null = null;
 
-  // host id
-  host: UserID = null;
-  // players from host clockwise
-  // even-indexed is in CFish.Team.FIRST
-  players: Tuple6<UserID | null> = [null, null, null, null, null, null];
-  // declared suits to team
+  host: UserID | null = null;
+  // players 0, 1, 2, etc. are host clockwise
+  // disconnected players are null
+  // even-indexed players are in CFish.Team.FIRST
+  players: PlayerID[] = [];
+  users: Record<PlayerID, UserID | null> = {} as any;
   declaredSuits: Record<FishSuit, CFish.Team> = {} as any;
 
   // these are index-dependent and player-agnostic
   // hands (maps to null for users != identity)
-  hand: Tuple6<Hand | null> = [null, null, null, null, null, null];
+  hand: Record<PlayerID, Hand | null> = {} as any;
   // hand size (because hands aren't public)
-  handSize: Tuple6<number | null> = [null, null, null, null, null, null];
+  handSize: Record<PlayerID, number> = {} as any;
 
   // asker asks askedCard from askee
   // asker valid if phase is ASK / ANSWER
-  asker: UserID | null = null;
+  asker: PlayerID | null = null;
   // askee, askedCard valid if phase is ANSWER
-  askee: UserID | null = null;
+  askee: PlayerID | null = null;
   askedCard: Card | null = null;
 
   // declarer declares declaredSuit
   // valid if phase is DECLARE
-  declarer: UserID | null = null;
+  declarer: PlayerID | null = null;
   declaredSuit: FishSuit | null = null;
 }
 
 export class Game extends Data {
-  // number of players
-  // player index
-  // player to team
-  // index to team
-  // team to players
-  // etc.
+  constructor(readonly numPlayers: number) {
+    super();
+    this.players = [...Array(numPlayers).keys()];
+    this.players.forEach((id) => {
+      this.users[id] = null;
+      this.hand[id] = null;
+      this.handSize[id] = 0;
+    });
+  }
+
+  indexOf(user: UserID): PlayerID {
+    const res = this.players.filter((id) => this.users[id] === user);
+    console.assert(res.length === 1);
+    return res[0];
+  }
+
+  teamOf(user: UserID): CFish.Team {
+    return this.indexOf(user) % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
+  }
+
+  playersOf(team: CFish.Team): PlayerID[] {
+    return this.players.filter((id) => id % 2 === Number(team));
+  }
 
   // rotate such that identity appears first
-  rotatedPlayers(): UserID[] {
-    return this.players;
+  rotatedPlayers(): PlayerID[] {
+    let res = this.players.slice();
+    if (this.identity !== null)
+      while (res[0] !== this.identity) res.push(res.shift());
+    return res;
   }
 
   // returns player to take next action, sensitive to phase
-  currentPlayer(): UserID | null {
+  currentPlayer(): PlayerID | null {
     return null;
   }
 
