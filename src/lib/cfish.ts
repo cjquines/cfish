@@ -1,4 +1,5 @@
-import assert from "assert/strict";
+import assert from "chai";
+import _ from "lodash";
 
 import { Card, FishSuit, Hand } from "lib/cards";
 
@@ -32,7 +33,8 @@ export class Data {
   // even-indexed seats are in CFish.Team.FIRST
   seats: SeatID[] = [];
   userOf: Record<SeatID, UserID | null> = {} as any;
-  declared: Record<FishSuit, CFish.Team> = {} as any;
+  // only partial record; nothing else can be undefined
+  declared: Partial<Record<FishSuit, CFish.Team>> = {} as any;
 
   // these are index-dependent and player-agnostic
   // hands; maps to null for private hands
@@ -62,12 +64,12 @@ export class Data {
 export class Engine extends Data {
   constructor(readonly numPlayers: number) {
     super();
-    this.seats = [...Array(numPlayers).keys()];
-    this.seats.forEach((seat) => {
+    this.seats = _.range(numPlayers);
+    for (const seat of this.seats) {
       this.userOf[seat] = null;
       this.handOf[seat] = null;
       this.handSize[seat] = 0;
-    });
+    }
   }
 
   // getters
@@ -91,7 +93,10 @@ export class Engine extends Data {
     return this.seats.filter((seat) => seat % 2 === Number(team));
   }
 
-  // scoreOf(team: CFish.Team): number
+  scoreOf(team: CFish.Team): number {
+    return Card.FISH_SUITS.filter((suit) => this.declared[suit] === team)
+      .length;
+  }
 
   // rotated such that user appears first
   rotatedSeats(user: UserID = this.identity): SeatID[] {
@@ -103,12 +108,13 @@ export class Engine extends Data {
   // protocol actions
 
   addUser(user: UserID): void {
-    assert.strictEqual(this.users.has(user), false);
+    assert.isNotOk(this.users.has(user));
     this.users.add(user);
+    if (this.host === null) this.host = user;
   }
 
   seatAt(user: UserID, seat: SeatID): void {
-    assert.strictEqual(this.users.has(user), true);
+    assert.isOk(this.users.has(user));
     assert.strictEqual(this.userOf[seat], null);
     this.userOf[seat] = user;
   }
@@ -119,20 +125,18 @@ export class Engine extends Data {
   }
 
   removeUser(user: UserID): void {
-    assert.strictEqual(this.users.has(user), true);
+    assert.isOk(this.users.has(user));
     const seat = this.seatOf(user);
     if (seat !== null) this.unseatAt(seat);
     if (user === this.host) {
-      let found = false;
-      this.seats.forEach((seat) => {
-        if (!found && this.userOf[seat] !== null) {
+      this.host = null;
+      for (const seat of this.seats) {
+        if (this.userOf[seat] !== null) {
           this.host = this.userOf[seat];
-          // ensure seats[0] is host
           this.seats = this.rotatedSeats(this.host);
-          found = true;
+          break;
         }
-      });
-      if (!found) this.host = null;
+      }
     }
   }
 
@@ -144,6 +148,7 @@ export class Engine extends Data {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
     assert.strictEqual(this.numSeated, this.numPlayers);
+
     // shuffle and deal cards
     // clear declared suits
     // clear asker, etc.

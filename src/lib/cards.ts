@@ -98,9 +98,21 @@ export class Card {
   readonly fishSuit: FishSuit;
 
   constructor(readonly cardSuit: CardSuit, readonly rank: Rank) {
-    assert.strictEqual(Card.validate(cardSuit, rank), true);
+    assert.ok(Card.validate(cardSuit, rank));
     this.fishSuit = Card.fishSuit(cardSuit, rank);
   }
+
+  static readonly FISH_SUITS = [
+    FishSuit.LOW_CLUBS,
+    FishSuit.HIGH_CLUBS,
+    FishSuit.LOW_DIAMONDS,
+    FishSuit.HIGH_DIAMONDS,
+    FishSuit.LOW_SPADES,
+    FishSuit.HIGH_SPADES,
+    FishSuit.LOW_HEARTS,
+    FishSuit.HIGH_HEARTS,
+    FishSuit.EIGHTS,
+  ];
 
   static validate(cardSuit: CardSuit, rank: Rank): boolean {
     return cardSuit === CardSuit.JOKER ? rank > Rank.A : rank <= Rank.A;
