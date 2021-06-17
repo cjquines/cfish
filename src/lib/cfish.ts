@@ -1,4 +1,4 @@
-import assert from "chai";
+import { assert } from "chai";
 import _ from "lodash";
 
 import { Card, FishSuit, genDeck, genFishSuit, Hand } from "lib/cards";
@@ -78,6 +78,10 @@ export class Engine extends Data {
     return this.seats.filter((seat) => this.userOf[seat] !== null).length;
   }
 
+  indexOf(seat: SeatID): number {
+    return this.seats.findIndex((seat_) => seat_ === seat);
+  }
+
   seatOf(user: UserID): SeatID | null {
     const res = this.seats.filter((seat) => this.userOf[seat] === user);
     return res.length === 1 ? res[0] : null;
@@ -100,7 +104,8 @@ export class Engine extends Data {
   rotatedSeats(user: UserID = this.identity): SeatID[] {
     const seat = this.seatOf(user);
     if (seat === null) return this.seats;
-    return this.seats.slice(seat).concat(this.seats.slice(0, seat));
+    const index = this.indexOf(seat);
+    return this.seats.slice(index).concat(this.seats.slice(0, index));
   }
 
   // protocol actions
@@ -114,6 +119,7 @@ export class Engine extends Data {
   seatAt(user: UserID, seat: SeatID): void {
     assert.isOk(this.users.has(user));
     assert.strictEqual(this.userOf[seat], null);
+    assert.strictEqual(this.seatOf(user), null);
     this.userOf[seat] = user;
   }
 
@@ -124,6 +130,8 @@ export class Engine extends Data {
 
   removeUser(user: UserID): void {
     assert.isOk(this.users.has(user));
+    this.users.delete(user);
+
     const seat = this.seatOf(user);
     if (seat !== null) this.unseatAt(seat);
     if (user === this.host) {
@@ -145,10 +153,10 @@ export class Engine extends Data {
   startGame(seat: SeatID): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
-    assert.strictEqual(this.numSeated, this.numPlayers);
+    assert.strictEqual(this.numSeated(), this.numPlayers);
 
     if (this.identity === null) {
-      const deck = _.shuffle(...genDeck());
+      const deck = _.shuffle([...genDeck()]);
       const deal = _.unzip(_.chunk(deck, this.numPlayers));
       for (const [seat, hand] of _.zip(this.seats, deal)) {
         this.handOf[seat] = new Hand(hand);

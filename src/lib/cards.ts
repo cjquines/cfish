@@ -165,7 +165,7 @@ export function* genFishSuit(suit: FishSuit): Generator<Card, void> {
 }
 
 export class Hand {
-  private cards: Card[];
+  private cards: Card[] = [];
 
   constructor(cards: Iterable<Card>) {
     for (const card of cards) this.insert(card);
