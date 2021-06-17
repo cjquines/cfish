@@ -1,7 +1,7 @@
 import assert from "chai";
 import _ from "lodash";
 
-import { Card, FishSuit, Hand } from "lib/cards";
+import { Card, FishSuit, genDeck, genFishSuit, Hand } from "lib/cards";
 
 export type UserID = string; // socket io id
 export type SeatID = number; // seat index (0, 1, 2, ...)
@@ -33,8 +33,8 @@ export class Data {
   // even-indexed seats are in CFish.Team.FIRST
   seats: SeatID[] = [];
   userOf: Record<SeatID, UserID | null> = {} as any;
-  // only partial record; nothing else can be undefined
-  declared: Partial<Record<FishSuit, CFish.Team>> = {} as any;
+  // only partial record; no other record can have undefined
+  declarerOf: Partial<Record<FishSuit, CFish.Team>> = {} as any;
 
   // these are index-dependent and player-agnostic
   // hands; maps to null for private hands
@@ -83,9 +83,7 @@ export class Engine extends Data {
     return res.length === 1 ? res[0] : null;
   }
 
-  teamOf(user: UserID): CFish.Team | null {
-    const seat = this.seatOf(user);
-    if (seat === null) return null;
+  teamOf(seat: SeatID): CFish.Team | null {
     return seat % 2 === 0 ? CFish.Team.FIRST : CFish.Team.SECOND;
   }
 
@@ -94,7 +92,7 @@ export class Engine extends Data {
   }
 
   scoreOf(team: CFish.Team): number {
-    return Card.FISH_SUITS.filter((suit) => this.declared[suit] === team)
+    return Card.FISH_SUITS.filter((suit) => this.declarerOf[suit] === team)
       .length;
   }
 
@@ -149,10 +147,23 @@ export class Engine extends Data {
     assert.strictEqual(this.userOf[seat], this.host);
     assert.strictEqual(this.numSeated, this.numPlayers);
 
-    // shuffle and deal cards
-    // clear declared suits
-    // clear asker, etc.
-    // set asker
+    if (this.identity === null) {
+      const deck = _.shuffle(...genDeck());
+      const deal = _.unzip(_.chunk(deck, this.numPlayers));
+      for (const [seat, hand] of _.zip(this.seats, deal)) {
+        this.handOf[seat] = new Hand(hand);
+        this.handSize[seat] = this.handOf[seat].size;
+      }
+    }
+
+    this.declarerOf = {} as any;
+    this.asker = null;
+    this.askee = null;
+    this.askedCard = null;
+    this.declarer = null;
+    this.declaredSuit = null;
+
+    this.asker = this.seats[0];
     this.phase = CFish.Phase.ASK;
   }
 
@@ -160,8 +171,12 @@ export class Engine extends Data {
   ask(asker: SeatID, askee: SeatID, card: Card): void {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
     assert.strictEqual(this.asker, asker);
-    // check if valid ask if we can
-    // set askee, card
+
+    assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
+    assert.isNotOk(this.handOf[asker].includes(card));
+
+    this.askee = askee;
+    this.askedCard = card;
     this.phase = CFish.Phase.ANSWER;
   }
 
@@ -169,30 +184,48 @@ export class Engine extends Data {
   answer(askee: SeatID, response: boolean): void {
     assert.strictEqual(this.phase, CFish.Phase.ANSWER);
     assert.strictEqual(this.askee, askee);
-    // check response correct if we can
-    // unset askee, card
-    // set asker
+
+    assert.strictEqual(this.handOf[askee].includes(this.askedCard), response);
+
+    this.askee = null;
+    this.askedCard = null;
+    this.asker = response ? this.asker : this.askee;
     this.phase = CFish.Phase.ASK;
   }
 
   // ASK -> DECLARE
   initDeclare(declarer: SeatID, declaredSuit: FishSuit): void {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
-    // check suit isn't declared yet
-    // set declarer, declaredSuit
+
+    assert.strictEqual(this.declarerOf[declaredSuit], undefined);
+
+    this.declarer = declarer;
+    this.declaredSuit = declaredSuit;
     this.phase = CFish.Phase.DECLARE;
   }
 
   // DECLARE -> ASK / FINISH
+  // owners: Record<card as string, SeatID>
   declare(declarer: SeatID, owners: Record<string, SeatID>): void {
     assert.strictEqual(this.phase, CFish.Phase.DECLARE);
     assert.strictEqual(this.declarer, declarer);
-    // check owners keys are all good
-    // check owners seats are all team
-    // check if correct or not
-    // add to declared suits
-    // if a team has majority declared suits, move to finish
-    // otherwise move back to asker
+
+    const team = this.teamOf(declarer);
+    let correct = true;
+    for (const card of genFishSuit(this.declaredSuit)) {
+      const owner = owners[String(card)];
+      assert.strictEqual(team, this.teamOf(owner));
+      correct &&= this.handOf[owner].includes(card);
+    }
+
+    const scorer = correct ? team : 1 - team;
+    this.declarerOf[this.declaredSuit] = scorer;
+    if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
+      // they win, hooray? what else?
+      this.phase = CFish.Phase.FINISH;
+    } else {
+      this.phase = CFish.Phase.ASK;
+    }
   }
 
   // FINISH -> WAIT

@@ -1,4 +1,5 @@
 import assert from "assert/strict";
+import _ from "lodash";
 
 export enum CardSuit {
   CLUBS,
@@ -102,6 +103,13 @@ export class Card {
     this.fishSuit = Card.fishSuit(cardSuit, rank);
   }
 
+  static readonly CARD_SUITS = [
+    CardSuit.CLUBS,
+    CardSuit.DIAMONDS,
+    CardSuit.SPADES,
+    CardSuit.HEARTS,
+  ];
+
   static readonly FISH_SUITS = [
     FishSuit.LOW_CLUBS,
     FishSuit.HIGH_CLUBS,
@@ -139,11 +147,28 @@ export class Card {
   }
 }
 
+export function* genDeck(): Generator<Card, void> {
+  for (const suit of Card.CARD_SUITS) {
+    for (let rank = Rank.R2; rank <= Rank.A; rank++) {
+      yield new Card(suit, rank);
+    }
+  }
+  yield new Card(CardSuit.JOKER, Rank.BLACK);
+  yield new Card(CardSuit.JOKER, Rank.RED);
+}
+
+const deckByFishSuit = _.groupBy(...genDeck(), "fishSuit");
+export function* genFishSuit(suit: FishSuit): Generator<Card, void> {
+  for (const card of deckByFishSuit[suit]) {
+    yield new Card(card.suit, card.rank);
+  }
+}
+
 export class Hand {
   private cards: Card[];
 
   constructor(cards: Iterable<Card>) {
-    for (let card of cards) this.insert(card);
+    for (const card of cards) this.insert(card);
   }
 
   get size(): number {
