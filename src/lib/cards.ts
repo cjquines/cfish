@@ -145,6 +145,10 @@ export class Card {
   toString(): string {
     return rankToString(this.rank) + cardSuitToString(this.cardSuit);
   }
+
+  equals(card: Card): boolean {
+    return this.cardSuit === card.cardSuit && this.rank === card.rank;
+  }
 }
 
 export function* genDeck(): Generator<Card, void> {
@@ -168,7 +172,9 @@ export class Hand {
   private cards: Card[] = [];
 
   constructor(cards: Iterable<Card>) {
-    for (const card of cards) this.insert(card);
+    for (const card of cards) {
+      this.insert(card);
+    }
   }
 
   get size(): number {
@@ -176,7 +182,7 @@ export class Hand {
   }
 
   includes(card: Card): boolean {
-    return this.cards.includes(card);
+    return this.cards.some((card_) => card_.equals(card));
   }
 
   insert(card: Card): void {

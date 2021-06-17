@@ -150,13 +150,13 @@ export class Engine extends Data {
   // first argument is always seat initiating
 
   // WAIT -> ASK
-  startGame(seat: SeatID): void {
+  startGame(seat: SeatID, shuffle: boolean = true): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
     assert.strictEqual(this.numSeated(), this.numPlayers);
 
     if (this.identity === null) {
-      const deck = _.shuffle([...genDeck()]);
+      const deck = shuffle ? _.shuffle([...genDeck()]) : [...genDeck()];
       const deal = _.unzip(_.chunk(deck, this.numPlayers));
       for (const [seat, hand] of _.zip(this.seats, deal)) {
         this.handOf[seat] = new Hand(hand);
@@ -180,6 +180,7 @@ export class Engine extends Data {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
     assert.strictEqual(this.asker, asker);
 
+    assert.notStrictEqual(this.teamOf(asker), this.teamOf(askee));
     assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
     assert.isNotOk(this.handOf[asker].includes(card));
 
