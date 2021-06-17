@@ -2,7 +2,7 @@
   "compilerOptions": {
     "outDir": "dist",
     "sourceMap": true,
-    "module": "ESNext",
+    "module": "commonjs",
     "moduleResolution": "node",
     "baseUrl": "./",
     "paths": {
