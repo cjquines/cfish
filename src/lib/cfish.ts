@@ -252,9 +252,13 @@ export class Engine extends Data {
   // debug
 
   toString(): string {
-    let res = "[declarations]\n";
+    let res = "[seats]\n";
+    for (const user of this.users) {
+      res += ` ${user} seated in ${this.seatOf(user)}\n`;
+    }
+    res += "[declarations]\n";
     for (let team = 0; team <= 1; team++) {
-      res += `${team}: (${this.scoreOf(team)}) `;
+      res += ` ${team}: (${this.scoreOf(team)}) `;
       for (const suit in Card.FISH_SUITS) {
         if (this.declarerOf[suit] === team) {
           res += `${FishSuit[suit]} `;
@@ -262,7 +266,7 @@ export class Engine extends Data {
       }
       res += `\n`;
     }
-    res += `[phase: ${CFish.Phase[this.phase]}]\n`;
+    res += `[phase: ${CFish.Phase[this.phase]}]\n `;
     if (this.phase === CFish.Phase.DECLARE) {
       res += `${this.declarer} declaring ${FishSuit[this.declaredSuit]}\n`;
     } else if (this.phase === CFish.Phase.ANSWER) {
@@ -272,7 +276,7 @@ export class Engine extends Data {
     }
     res += "[hands]\n";
     for (const seat of this.seats) {
-      res += `${seat}: ${this.handOf[seat]}\n`;
+      res += ` ${seat}: ${this.handOf[seat]}\n`;
     }
     return res;
   }

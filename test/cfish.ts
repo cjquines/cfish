@@ -63,7 +63,7 @@ describe("Engine", () => {
     (() => engine.ask(0, 1, C.C_2)).should.throw;
     (() => engine.ask(0, 2, C.C_3)).should.throw;
     engine.ask(0, 1, C.C_3);
-    (() => engine.answer(1, false)).should.throw;    
+    (() => engine.answer(1, false)).should.throw;
     engine.answer(1, true);
 
     engine.ask(0, 1, C.C_4);
@@ -107,7 +107,7 @@ describe("Engine", () => {
         owners[String(card)] = owner;
       }
       engine.declare(declarer, owners);
-    }
+    };
     trashDeclare(3, FishSuit.LOW_CLUBS, 1);
 
     engine.scoreOf(0).should.equal(1);
@@ -128,6 +128,11 @@ describe("Engine", () => {
     engine.phase.should.equal(CFish.Phase.FINISH);
   });
 
-  // handles removing/adding during a game
-  // also somehow test protocol
+  it("runs a game with people added/removed", () => {
+    const engine = filledEngine();
+
+    engine.startGame(0, false);
+    engine.addUser("g");
+    engine.unseatAt(5);
+  });
 });
