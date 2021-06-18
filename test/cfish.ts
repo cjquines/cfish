@@ -58,7 +58,7 @@ describe("Engine", () => {
     engine.startGame(0, false);
     engine.asker.should.equal(0);
     // some nicer stringification should be nice
-    console.log(engine.handOf[1]);
+    console.log(engine.toString());
 
     (() => engine.ask(0, 1, new Card(CardSuit.CLUBS, Rank.R2))).should.throw;
 

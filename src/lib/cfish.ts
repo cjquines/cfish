@@ -108,6 +108,30 @@ export class Engine extends Data {
     return this.seats.slice(index).concat(this.seats.slice(0, index));
   }
 
+  toString(): string {
+    let res = "[declarations]\n";
+    for (const team in [CFish.Team.FIRST, CFish.Team.SECOND]) {
+      res += `${team}: `;
+      for (const suit in Card.FISH_SUITS) {
+        if (this.declarerOf[suit] === team) {
+          res += `${suit} `;
+        }
+      }
+      res += `\n`;
+    }
+    res += `[phase: ${CFish.Phase[this.phase]}]\n`;
+    if (this.phase === CFish.Phase.DECLARE) {
+      res += `${this.declarer} declaring ${this.declaredSuit}\n`;
+    } else {
+      res += `${this.asker} asking ${this.askee} for ${this.askedCard}\n`;
+    }
+    res += "[hands]\n";
+    for (const seat of this.seats) {
+      res += `${seat}: ${this.handOf[seat]}\n`;
+    }
+    return res;
+  }
+
   // protocol actions
 
   addUser(user: UserID): void {
@@ -171,7 +195,7 @@ export class Engine extends Data {
     this.declarer = null;
     this.declaredSuit = null;
 
-    this.asker = this.seats[0];
+    this.asker = this.seats[0]; // host goes first
     this.phase = CFish.Phase.ASK;
   }
 
@@ -225,6 +249,7 @@ export class Engine extends Data {
       const owner = owners[String(card)];
       assert.strictEqual(team, this.teamOf(owner));
       correct &&= this.handOf[owner].includes(card);
+      // remove the cards
     }
 
     const scorer = correct ? team : 1 - team;

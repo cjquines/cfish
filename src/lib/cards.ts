@@ -146,8 +146,18 @@ export class Card {
     return rankToString(this.rank) + cardSuitToString(this.cardSuit);
   }
 
+  compare(card: Card): number {
+    if (this.fishSuit - card.fishSuit) {
+      return this.fishSuit - card.fishSuit;
+    } else if (this.cardSuit - card.cardSuit) {
+      return this.cardSuit - card.cardSuit;
+    } else {
+      return this.rank - card.rank;
+    }
+  }
+
   equals(card: Card): boolean {
-    return this.cardSuit === card.cardSuit && this.rank === card.rank;
+    return this.compare(card) === 0;
   }
 }
 
@@ -197,5 +207,9 @@ export class Hand {
 
   hasSuit(fishSuit: FishSuit): boolean {
     return this.cards.some((card) => card.fishSuit === fishSuit);
+  }
+
+  toString(): string {
+    return this.cards.sort((a, b) => a.compare(b)).join(" ");
   }
 }
