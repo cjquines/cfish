@@ -1,8 +1,9 @@
 import { should } from "chai";
 import "chai/register-should";
 
-import { Card, CardSuit, Rank } from "lib/cards";
-import { Engine } from "lib/cfish";
+import * as C from "./common";
+import { FishSuit, genFishSuit } from "lib/cards";
+import { CFish, Engine } from "lib/cfish";
 
 describe("Engine", () => {
   const filledEngine = () => {
@@ -57,12 +58,74 @@ describe("Engine", () => {
 
     engine.startGame(0, false);
     engine.asker.should.equal(0);
-    // some nicer stringification should be nice
-    console.log(engine.toString());
 
-    (() => engine.ask(0, 1, new Card(CardSuit.CLUBS, Rank.R2))).should.throw;
+    (() => engine.ask(1, 0, C.C_2)).should.throw;
+    (() => engine.ask(0, 1, C.C_2)).should.throw;
+    (() => engine.ask(0, 2, C.C_3)).should.throw;
+    engine.ask(0, 1, C.C_3);
+    (() => engine.answer(1, false)).should.throw;    
+    engine.answer(1, true);
 
-    engine.ask(0, 1, new Card(CardSuit.CLUBS, Rank.R3));
+    engine.ask(0, 1, C.C_4);
+    (() => engine.answer(1, true)).should.throw;
+    engine.answer(1, false);
+
+    (() => engine.ask(1, 0, C.C_2)).should.throw;
+    engine.ask(1, 0, C.C_A);
+    (() => engine.answer(1, true)).should.throw;
+    engine.answer(0, true);
+
+    engine.ask(1, 2, C.C_10);
+    engine.answer(2, true);
+    engine.ask(1, 4, C.C_Q);
+    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+    engine.answer(4, true);
+
+    let owners = {};
+    engine.initDeclare(3, FishSuit.HIGH_CLUBS);
+    (() => engine.declare(3, owners)).should.throw;
+    owners[String(C.C_9)] = 1;
+    owners[String(C.C_10)] = 1;
+    owners[String(C.C_Q)] = 1;
+    owners[String(C.C_A)] = 1;
+    (() => engine.declare(3, owners)).should.throw;
+    owners[String(C.C_J)] = 3;
+    owners[String(C.C_K)] = 4;
+    (() => engine.declare(3, owners)).should.throw;
+    owners[String(C.C_K)] = 5;
+    engine.declare(3, owners);
+
+    engine.scoreOf(0).should.equal(0);
+    engine.scoreOf(1).should.equal(1);
+
+    owners = {};
+    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+
+    const trashDeclare = (declarer, suit, owner) => {
+      engine.initDeclare(declarer, suit);
+      for (const card of genFishSuit(suit)) {
+        owners[String(card)] = owner;
+      }
+      engine.declare(declarer, owners);
+    }
+    trashDeclare(3, FishSuit.LOW_CLUBS, 1);
+
+    engine.scoreOf(0).should.equal(1);
+    engine.scoreOf(1).should.equal(1);
+
+    trashDeclare(0, FishSuit.LOW_DIAMONDS, 0);
+    trashDeclare(1, FishSuit.HIGH_DIAMONDS, 1);
+    trashDeclare(0, FishSuit.LOW_SPADES, 0);
+    trashDeclare(1, FishSuit.HIGH_SPADES, 1);
+    trashDeclare(0, FishSuit.LOW_HEARTS, 0);
+    trashDeclare(1, FishSuit.HIGH_HEARTS, 1);
+
+    engine.scoreOf(0).should.equal(4);
+    engine.scoreOf(1).should.equal(4);
+
+    trashDeclare(0, FishSuit.EIGHTS, 0);
+
+    engine.phase.should.equal(CFish.Phase.FINISH);
   });
 
   // handles removing/adding during a game

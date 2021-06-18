@@ -108,30 +108,6 @@ export class Engine extends Data {
     return this.seats.slice(index).concat(this.seats.slice(0, index));
   }
 
-  toString(): string {
-    let res = "[declarations]\n";
-    for (const team in [CFish.Team.FIRST, CFish.Team.SECOND]) {
-      res += `${team}: `;
-      for (const suit in Card.FISH_SUITS) {
-        if (this.declarerOf[suit] === team) {
-          res += `${suit} `;
-        }
-      }
-      res += `\n`;
-    }
-    res += `[phase: ${CFish.Phase[this.phase]}]\n`;
-    if (this.phase === CFish.Phase.DECLARE) {
-      res += `${this.declarer} declaring ${this.declaredSuit}\n`;
-    } else {
-      res += `${this.asker} asking ${this.askee} for ${this.askedCard}\n`;
-    }
-    res += "[hands]\n";
-    for (const seat of this.seats) {
-      res += `${seat}: ${this.handOf[seat]}\n`;
-    }
-    return res;
-  }
-
   // protocol actions
 
   addUser(user: UserID): void {
@@ -220,9 +196,13 @@ export class Engine extends Data {
 
     assert.strictEqual(this.handOf[askee].includes(this.askedCard), response);
 
+    if (response) {
+      this.handOf[this.asker].insert(this.askedCard);
+      this.handOf[this.askee].remove(this.askedCard);
+    }
+    this.asker = response ? this.asker : this.askee;
     this.askee = null;
     this.askedCard = null;
-    this.asker = response ? this.asker : this.askee;
     this.phase = CFish.Phase.ASK;
   }
 
@@ -247,13 +227,16 @@ export class Engine extends Data {
     let correct = true;
     for (const card of genFishSuit(this.declaredSuit)) {
       const owner = owners[String(card)];
+      assert.notStrictEqual(owner, undefined);
       assert.strictEqual(team, this.teamOf(owner));
       correct &&= this.handOf[owner].includes(card);
-      // remove the cards
+    }
+    for (const seat of this.seats) {
+      this.handOf[seat].removeSuit(this.declaredSuit);
     }
 
     const scorer = correct ? team : 1 - team;
-    this.declarerOf[this.declaredSuit] = scorer;
+    this.declarerOf[this.declaredSuit] = scorer as CFish.Team;
     if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
       // they win, hooray? what else?
       this.phase = CFish.Phase.FINISH;
@@ -265,4 +248,32 @@ export class Engine extends Data {
   // FINISH -> WAIT
   // newGame(host: SeatID): void
   // just do a phase change?
+
+  // debug
+
+  toString(): string {
+    let res = "[declarations]\n";
+    for (let team = 0; team <= 1; team++) {
+      res += `${team}: (${this.scoreOf(team)}) `;
+      for (const suit in Card.FISH_SUITS) {
+        if (this.declarerOf[suit] === team) {
+          res += `${FishSuit[suit]} `;
+        }
+      }
+      res += `\n`;
+    }
+    res += `[phase: ${CFish.Phase[this.phase]}]\n`;
+    if (this.phase === CFish.Phase.DECLARE) {
+      res += `${this.declarer} declaring ${FishSuit[this.declaredSuit]}\n`;
+    } else if (this.phase === CFish.Phase.ANSWER) {
+      res += `${this.asker} asking ${this.askee} for ${this.askedCard}\n`;
+    } else if (this.phase === CFish.Phase.ASK) {
+      res += `${this.asker} asking\n`;
+    }
+    res += "[hands]\n";
+    for (const seat of this.seats) {
+      res += `${seat}: ${this.handOf[seat]}\n`;
+    }
+    return res;
+  }
 }

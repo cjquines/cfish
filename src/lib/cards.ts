@@ -123,7 +123,12 @@ export class Card {
   ];
 
   static validate(cardSuit: CardSuit, rank: Rank): boolean {
-    return cardSuit === CardSuit.JOKER ? rank > Rank.A : rank <= Rank.A;
+    return [
+      cardSuit !== undefined,
+      rank !== undefined,
+      cardSuit === CardSuit.JOKER || (rank >= Rank.R2 && rank <= Rank.A),
+      cardSuit !== CardSuit.JOKER || (rank > Rank.A && rank <= Rank.RED),
+    ].every(Boolean);
   }
 
   static fishSuit(cardSuit: CardSuit, rank: Rank): FishSuit {
@@ -171,10 +176,10 @@ export function* genDeck(): Generator<Card, void> {
   yield new Card(CardSuit.JOKER, Rank.RED);
 }
 
-const deckByFishSuit = _.groupBy(...genDeck(), "fishSuit");
+const deckByFishSuit = _.groupBy([...genDeck()], "fishSuit");
 export function* genFishSuit(suit: FishSuit): Generator<Card, void> {
   for (const card of deckByFishSuit[suit]) {
-    yield new Card(card.suit, card.rank);
+    yield new Card(card.cardSuit, card.rank);
   }
 }
 
@@ -200,9 +205,13 @@ export class Hand {
   }
 
   remove(card: Card): void {
-    const idx = this.cards.indexOf(card);
+    const idx = this.cards.findIndex((card_) => card_.equals(card));
     assert.notStrictEqual(idx, -1);
-    this.cards.splice(idx);
+    this.cards.splice(idx, 1);
+  }
+
+  removeSuit(fishSuit: FishSuit): void {
+    _.remove(this.cards, (card) => card.fishSuit === fishSuit);
   }
 
   hasSuit(fishSuit: FishSuit): boolean {

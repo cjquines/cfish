@@ -1,0 +1,60 @@
+import { Card, CardSuit, Rank } from "lib/cards";
+
+export const C_2 = new Card(CardSuit.CLUBS, Rank.R2);
+export const C_3 = new Card(CardSuit.CLUBS, Rank.R3);
+export const C_4 = new Card(CardSuit.CLUBS, Rank.R4);
+export const C_5 = new Card(CardSuit.CLUBS, Rank.R5);
+export const C_6 = new Card(CardSuit.CLUBS, Rank.R6);
+export const C_7 = new Card(CardSuit.CLUBS, Rank.R7);
+export const C_8 = new Card(CardSuit.CLUBS, Rank.R8);
+export const C_9 = new Card(CardSuit.CLUBS, Rank.R9);
+export const C_10 = new Card(CardSuit.CLUBS, Rank.R10);
+export const C_J = new Card(CardSuit.CLUBS, Rank.J);
+export const C_Q = new Card(CardSuit.CLUBS, Rank.Q);
+export const C_K = new Card(CardSuit.CLUBS, Rank.K);
+export const C_A = new Card(CardSuit.CLUBS, Rank.A);
+
+export const D_2 = new Card(CardSuit.DIAMONDS, Rank.R2);
+export const D_3 = new Card(CardSuit.DIAMONDS, Rank.R3);
+export const D_4 = new Card(CardSuit.DIAMONDS, Rank.R4);
+export const D_5 = new Card(CardSuit.DIAMONDS, Rank.R5);
+export const D_6 = new Card(CardSuit.DIAMONDS, Rank.R6);
+export const D_7 = new Card(CardSuit.DIAMONDS, Rank.R7);
+export const D_8 = new Card(CardSuit.DIAMONDS, Rank.R8);
+export const D_9 = new Card(CardSuit.DIAMONDS, Rank.R9);
+export const D_10 = new Card(CardSuit.DIAMONDS, Rank.R10);
+export const D_J = new Card(CardSuit.DIAMONDS, Rank.J);
+export const D_Q = new Card(CardSuit.DIAMONDS, Rank.Q);
+export const D_K = new Card(CardSuit.DIAMONDS, Rank.K);
+export const D_A = new Card(CardSuit.DIAMONDS, Rank.A);
+
+export const S_2 = new Card(CardSuit.SPADES, Rank.R2);
+export const S_3 = new Card(CardSuit.SPADES, Rank.R3);
+export const S_4 = new Card(CardSuit.SPADES, Rank.R4);
+export const S_5 = new Card(CardSuit.SPADES, Rank.R5);
+export const S_6 = new Card(CardSuit.SPADES, Rank.R6);
+export const S_7 = new Card(CardSuit.SPADES, Rank.R7);
+export const S_8 = new Card(CardSuit.SPADES, Rank.R8);
+export const S_9 = new Card(CardSuit.SPADES, Rank.R9);
+export const S_10 = new Card(CardSuit.SPADES, Rank.R10);
+export const S_J = new Card(CardSuit.SPADES, Rank.J);
+export const S_Q = new Card(CardSuit.SPADES, Rank.Q);
+export const S_K = new Card(CardSuit.SPADES, Rank.K);
+export const S_A = new Card(CardSuit.SPADES, Rank.A);
+
+export const H_2 = new Card(CardSuit.HEARTS, Rank.R2);
+export const H_3 = new Card(CardSuit.HEARTS, Rank.R3);
+export const H_4 = new Card(CardSuit.HEARTS, Rank.R4);
+export const H_5 = new Card(CardSuit.HEARTS, Rank.R5);
+export const H_6 = new Card(CardSuit.HEARTS, Rank.R6);
+export const H_7 = new Card(CardSuit.HEARTS, Rank.R7);
+export const H_8 = new Card(CardSuit.HEARTS, Rank.R8);
+export const H_9 = new Card(CardSuit.HEARTS, Rank.R9);
+export const H_10 = new Card(CardSuit.HEARTS, Rank.R10);
+export const H_J = new Card(CardSuit.HEARTS, Rank.J);
+export const H_Q = new Card(CardSuit.HEARTS, Rank.Q);
+export const H_K = new Card(CardSuit.HEARTS, Rank.K);
+export const H_A = new Card(CardSuit.HEARTS, Rank.A);
+
+export const J_B = new Card(CardSuit.JOKER, Rank.BLACK);
+export const J_R = new Card(CardSuit.JOKER, Rank.RED);
