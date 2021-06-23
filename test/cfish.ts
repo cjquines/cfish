@@ -35,7 +35,7 @@ describe("Engine", () => {
     engine.removeUser("b");
 
     engine.users.size.should.equal(4);
-    engine.numSeated().should.equal(4);
+    engine.numSeated.should.equal(4);
     engine.host.should.equal("c");
     engine.seats.should.deep.equal([2, 3, 4, 5, 0, 1]);
     (() => engine.startGame(0)).should.throw();

@@ -74,8 +74,12 @@ export class Engine extends Data {
 
   // getters
 
-  numSeated(): number {
+  get numSeated(): number {
     return this.seats.filter((seat) => this.userOf[seat] !== null).length;
+  }
+
+  get ownSeat(): SeatID | null {
+    return this.seatOf(this.identity);
   }
 
   indexOf(seat: SeatID): number {
@@ -133,7 +137,9 @@ export class Engine extends Data {
     this.users.delete(user);
 
     const seat = this.seatOf(user);
-    if (seat !== null) this.unseatAt(seat);
+    if (seat !== null) {
+      this.unseatAt(seat);
+    }
     if (user === this.host) {
       this.host = null;
       for (const seat of this.seats) {
@@ -154,7 +160,7 @@ export class Engine extends Data {
   startGame(seat: SeatID, shuffle: boolean = true): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
-    assert.strictEqual(this.numSeated(), this.numPlayers);
+    assert.strictEqual(this.numSeated, this.numPlayers);
 
     if (this.identity === null) {
       const deck = shuffle ? _.shuffle([...genDeck()]) : [...genDeck()];
@@ -181,9 +187,8 @@ export class Engine extends Data {
     hand: Hand | null,
     handSizes: Record<SeatID, number>
   ): void {
-    const seat = this.seatOf(this.identity);
-    if (seat !== null) {
-      this.handOf[seat] = hand;
+    if (this.ownSeat !== null) {
+      this.handOf[this.ownSeat] = hand;
     }
     this.handSize = handSizes;
   }
