@@ -6,18 +6,17 @@ import { FishSuit, genFishSuit } from "lib/cards";
 import { CFish, Engine } from "lib/cfish";
 
 describe("Engine", () => {
-  const filledEngine = () => {
-    const engine = new Engine(6);
+  let engine;
+
+  beforeEach(() => {
+    engine = new Engine(6);
     ["a", "b", "c", "d", "e", "f"].forEach((user, seat) => {
       engine.addUser(user);
       engine.seatAt(user, seat);
     });
-    return engine;
-  };
+  });
 
   it("handles seating", () => {
-    const engine = filledEngine();
-
     (() => engine.addUser("a")).should.throw();
     (() => engine.removeUser("g")).should.throw();
 
@@ -54,8 +53,6 @@ describe("Engine", () => {
   });
 
   it("runs a basic game", () => {
-    const engine = filledEngine();
-
     engine.startGame(0, false);
     engine.asker.should.equal(0);
 
@@ -129,8 +126,6 @@ describe("Engine", () => {
   });
 
   it("runs a game with people added/removed", () => {
-    const engine = filledEngine();
-
     engine.startGame(0, false);
     engine.addUser("g");
     engine.unseatAt(5);
