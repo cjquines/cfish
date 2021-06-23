@@ -150,6 +150,7 @@ export class Engine extends Data {
   // first argument is always seat initiating
 
   // WAIT -> ASK
+  // server response: player hands
   startGame(seat: SeatID, shuffle: boolean = true): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
@@ -175,14 +176,28 @@ export class Engine extends Data {
     this.phase = CFish.Phase.ASK;
   }
 
+  startGameResponse(
+    server: null,
+    hand: Hand | null,
+    handSizes: Record<SeatID, number>
+  ): void {
+    const seat = this.seatOf(this.identity);
+    if (seat !== null) {
+      this.handOf[seat] = hand;
+    }
+    this.handSize = handSizes;
+  }
+
   // ASK -> ANSWER
   ask(asker: SeatID, askee: SeatID, card: Card): void {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
     assert.strictEqual(this.asker, asker);
-
     assert.notStrictEqual(this.teamOf(asker), this.teamOf(askee));
-    assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
-    assert.isNotOk(this.handOf[asker].includes(card));
+
+    if (this.handOf[asker] !== null) {
+      assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
+      assert.isNotOk(this.handOf[asker].includes(card));
+    }
 
     this.askee = askee;
     this.askedCard = card;
@@ -194,11 +209,19 @@ export class Engine extends Data {
     assert.strictEqual(this.phase, CFish.Phase.ANSWER);
     assert.strictEqual(this.askee, askee);
 
-    assert.strictEqual(this.handOf[askee].includes(this.askedCard), response);
+    if (this.handOf[askee] !== null) {
+      assert.strictEqual(this.handOf[askee].includes(this.askedCard), response);
+    }
 
     if (response) {
-      this.handOf[this.asker].insert(this.askedCard);
-      this.handOf[this.askee].remove(this.askedCard);
+      if (this.handOf[this.asker] !== null) {
+        this.handOf[this.asker].insert(this.askedCard);
+      }
+      if (this.handOf[this.askee] !== null) {
+        this.handOf[this.askee].remove(this.askedCard);
+      }
+      this.handSize[this.asker] += 1;
+      this.handSize[this.askee] -= 1;
     }
     this.asker = response ? this.asker : this.askee;
     this.askee = null;
@@ -209,7 +232,6 @@ export class Engine extends Data {
   // ASK -> DECLARE
   initDeclare(declarer: SeatID, declaredSuit: FishSuit): void {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
-
     assert.strictEqual(this.declarerOf[declaredSuit], undefined);
 
     this.declarer = declarer;
@@ -219,30 +241,57 @@ export class Engine extends Data {
 
   // DECLARE -> ASK / FINISH
   // owners: Record<card as string, SeatID>
-  declare(declarer: SeatID, owners: Record<string, SeatID>): void {
+  // server response: correct or not
+  declare(declarer: SeatID, owners: Record<string, SeatID>): boolean {
     assert.strictEqual(this.phase, CFish.Phase.DECLARE);
     assert.strictEqual(this.declarer, declarer);
 
     const team = this.teamOf(declarer);
     let correct = true;
+
     for (const card of genFishSuit(this.declaredSuit)) {
       const owner = owners[String(card)];
       assert.notStrictEqual(owner, undefined);
       assert.strictEqual(team, this.teamOf(owner));
-      correct &&= this.handOf[owner].includes(card);
-    }
-    for (const seat of this.seats) {
-      this.handOf[seat].removeSuit(this.declaredSuit);
+      if (this.handOf[owner] !== null) {
+        correct &&= this.handOf[owner].includes(card);
+      }
     }
 
+    for (const seat of this.seats) {
+      if (this.handOf[seat] !== null) {
+        this.handOf[seat].removeSuit(this.declaredSuit);
+        this.handSize[seat] = this.handOf[seat].size;
+      }
+    }
+
+    if (this.identity === null) {
+      this.declareResponse(null, correct, this.handSize);
+    }
+
+    return correct;
+  }
+
+  declareResponse(
+    server: null,
+    correct: boolean,
+    handSizes: Record<SeatID, number>
+  ): void {
+    const team = this.teamOf(this.declarer);
     const scorer = correct ? team : 1 - team;
+
     this.declarerOf[this.declaredSuit] = scorer as CFish.Team;
+
     if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
       // they win, hooray? what else?
       this.phase = CFish.Phase.FINISH;
     } else {
+      // special case: person asking no longer has cards
       this.phase = CFish.Phase.ASK;
     }
+
+    this.declarer = null;
+    this.declaredSuit = null;
   }
 
   // FINISH -> WAIT
