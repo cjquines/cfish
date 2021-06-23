@@ -2,8 +2,8 @@ import { assert } from "chai";
 import _ from "lodash";
 
 import { Card, FishSuit, genDeck, genFishSuit, Hand } from "lib/cards";
+import { UserID } from "lib/server";
 
-export type UserID = string; // socket io id
 export type SeatID = number; // seat index (0, 1, 2, ...)
 
 export namespace CFish {
