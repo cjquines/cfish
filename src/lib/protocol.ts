@@ -9,7 +9,7 @@ export namespace Protocol {
 
   export type AddUser = {
     type: "addUser";
-    user: User;
+    user: UserID;
   };
 
   export type SeatAt = {

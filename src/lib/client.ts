@@ -6,9 +6,9 @@ import { Protocol as P } from "lib/protocol";
 
 export class Client {
   engine: Engine | null = null;
-  me: P.User | null = null;
-  status: "waiting" | "connected" | "disconnected" = "waiting";
+  identity: P.User | null = null;
   socket: Socket;
+  status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
 
   constructor(readonly url: string, public name: string) {
@@ -29,4 +29,9 @@ export class Client {
   }
 
   addUser(event: P.AddUser): void {}
+
+  // on connect, say hi and don the identity
+  // protocol actions are join, leave, rename
+  // take reset from above
+  // take events from above
 }
