@@ -1,3 +1,4 @@
+import { Card, FishSuit, Hand } from "lib/cards";
 import { SeatID } from "lib/cfish";
 import { UserID } from "lib/server";
 
@@ -18,9 +19,70 @@ export namespace Protocol {
     seat: SeatID;
   };
 
-  export type UnseatAt = {};
-  export type RemoveUser = {};
-  export type Hand = {};
+  export type UnseatAt = {
+    type: "unseatAt";
+    seat: SeatID;
+  };
 
-  export type Event = AddUser | SeatAt | UnseatAt | RemoveUser | Hand;
+  export type RemoveUser = {
+    type: "removeUser";
+    user: UserID;
+  };
+
+  export type StartGame = {
+    type: "startGame";
+    seat: SeatID;
+  };
+
+  export type StartGameResponse = {
+    type: "startGameResponse";
+    server: null;
+    hand: Hand | null;
+    handSizes: Record<SeatID, number>;
+  };
+
+  export type Ask = {
+    type: "ask";
+    asker: SeatID;
+    askee: SeatID;
+    card: Card;
+  };
+
+  export type Answer = {
+    type: "answer";
+    askee: SeatID;
+    response: boolean;
+  };
+
+  export type InitDeclare = {
+    type: "initDeclare";
+    declarer: SeatID;
+    declaredSuit: FishSuit;
+  };
+
+  export type Declare = {
+    type: "declare";
+    declarer: SeatID;
+    owners: Record<string, SeatID>;
+  };
+
+  export type DeclareResponse = {
+    type: "DeclareResponse";
+    server: null;
+    correct: boolean;
+    handSizes: Record<SeatID, number>;
+  };
+
+  export type Event =
+    | AddUser
+    | SeatAt
+    | UnseatAt
+    | RemoveUser
+    | StartGame
+    | StartGameResponse
+    | Ask
+    | Answer
+    | InitDeclare
+    | Declare
+    | DeclareResponse;
 }
