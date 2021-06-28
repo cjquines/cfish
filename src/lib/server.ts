@@ -102,6 +102,7 @@ export class Room {
     switch (event.type) {
       case "seatAt":
         this.engine.seatAt(event.user, event.seat);
+        this.reset(this.findUser(event.user));
         return;
       case "unseatAt":
         this.engine.unseatAt(event.seat);

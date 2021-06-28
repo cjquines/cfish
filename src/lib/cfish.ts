@@ -128,9 +128,9 @@ export class Engine extends Data {
     res.userOf = this.userOf;
     res.declarerOf = this.declarerOf;
 
-    const seat = this.seatOf(user);
-    if (seat !== null) {
-      res.handOf[seat] = this.handOf[seat];
+    const seat_ = this.seatOf(user);
+    for (const seat of this.seats) {
+      res.handOf[seat] = seat === seat_ ? this.handOf[seat] : null;
     }
     res.handSize = this.handSize;
 
