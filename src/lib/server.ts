@@ -91,8 +91,10 @@ export class Room {
   }
 
   // forward redacted state to client
-  reset(): void {
-    // we also need to forward when they get seated and they previously weren't...
+  reset(user: P.User): void {
+    const res = this.engine.redactFor(user.id);
+    // cross your fingers and hope this serializes properly
+    this.socket.to(user.id).emit("reset", res);
   }
 
   // process event from client and broadcast
@@ -115,6 +117,7 @@ export class Server {
       console.log(`join client ${client.id}`);
 
       client.on("join", (room, name) => this.join(client.id, room, name));
+      client.on("reset", () => this.reset(client.id));
       client.on("event", (event) => this.event(client.id, event));
       client.on("rename", (name) => this.rename(client.id, name));
       client.on("disconnect", () => this.leave(client.id));
@@ -142,6 +145,11 @@ export class Server {
     this.clients[id].join(room);
     this.rooms[room].join(user);
     this.roomOf[id] = room;
+  }
+
+  reset(id: UserID): void {
+    const { user, room } = this.userAndRoom(id);
+    this.rooms[room].reset(user);
   }
 
   event(id: UserID, event: P.Event): void {

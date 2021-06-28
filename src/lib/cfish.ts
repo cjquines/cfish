@@ -24,6 +24,7 @@ export namespace CFish {
 export class Data {
   phase: CFish.Phase = CFish.Phase.WAIT;
   // all users in the room
+  // TODO: change this to not set so it's serializable
   users: Set<UserID> = new Set();
   // whose data is this? null is server
   identity: UserID | null = null;
@@ -110,6 +111,34 @@ export class Engine extends Data {
     if (seat === null) return this.seats;
     const index = this.indexOf(seat);
     return this.seats.slice(index).concat(this.seats.slice(0, index));
+  }
+
+  // dupe and redact state
+  redactFor(user: UserID): Engine {
+    const res = new Engine(this.numPlayers);
+    res.phase = this.phase;
+    res.users = this.users;
+    res.identity = user;
+    res.host = this.host;
+
+    res.seats = this.seats;
+    res.userOf = this.userOf;
+    res.declarerOf = this.declarerOf;
+
+    const seat = this.seatOf(user);
+    if (seat !== null) {
+      res.handOf[seat] = this.handOf[seat];
+    }
+    res.handSize = this.handSize;
+
+    res.asker = this.asker;
+    res.askee = this.askee;
+    res.askedCard = this.askedCard;
+
+    res.declarer = this.declarer;
+    res.declaredSuit = this.declaredSuit;
+
+    return res;
   }
 
   // protocol actions
