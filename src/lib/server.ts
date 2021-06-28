@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 
-import { Engine } from "lib/cfish";
+import { Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 
 export type RoomID = string;
@@ -14,52 +14,153 @@ export class Room {
 
   constructor(
     readonly id: RoomID,
-    readonly socket: Socket,
-    private closeCallback: (RoomID) => void,
+    readonly socket: IOServer,
+    public closeCallback: (RoomID) => void,
     numPlayers: number
   ) {
     this.engine = new Engine(numPlayers);
   }
 
+  // helpers
+
+  findUser(id: UserID): P.User | null {
+    const res = this.users.filter((user) => user.id === id);
+    return res.length === 1 ? res[0] : null;
+  }
+
+  // to be handled by client
+  toAll(event: string, ...args: any[]): void {
+    this.socket.to(this.id).emit(event, ...args);
+  }
+
+  // to be handled by client engine
+  event(event: P.Event): void {
+    this.toAll("event", event);
+  }
+
+  toSeat(seat: SeatID, event: P.Event): void {
+    const id = this.engine.userOf[seat];
+    assert.notStrictEqual(id, null);
+    this.socket.to(id).emit("event", event);
+  }
+
   // protocol actions
-  // take client, broadcast P.User to client
-  join(): void {}
-  // remove client and broadcast
-  kick(): void {}
-  // rename client and broadcast
-  rename(): void {}
+
+  join(user: P.User): void {
+    assert.strictEqual(this.findUser(user.id), null);
+    this.users.push(user);
+
+    this.engine.addUser(user.id);
+    this.toAll("join", user);
+    this.event({
+      type: "addUser",
+      user: user.id,
+    });
+  }
+
+  rename(user: P.User, name: string): void {
+    const user_ = this.findUser(user.id);
+    assert.notStrictEqual(user_, null);
+    user_.name = name;
+
+    this.toAll("rename", user, name);
+  }
+
+  leave(user: P.User): void {
+    const idx = this.users.findIndex((user_) => user_.id === user.id);
+    assert.notStrictEqual(idx, -1);
+    this.users.splice(idx, 1);
+    if (this.users.length === 0) {
+      this.close();
+    }
+
+    this.engine.removeUser(user.id);
+    this.toAll("leave", user);
+    this.event({
+      type: "removeUser",
+      user: user.id,
+    });
+  }
+
   // destroy room
-  close(): void {}
+  close(): void {
+    while (this.users.length > 0) {
+      this.leave(this.users[0]);
+    }
+    this.closeCallback(this.id);
+  }
 
   // forward redacted state to client
-  reset(): void {}
+  reset(): void {
+    // we also need to forward when they get seated and they previously weren't...
+  }
+
   // process event from client and broadcast
-  update(): void {}
+  update(user: P.User, event: P.Event): void {
+    // special casing on some events with responses
+  }
 }
 
 export class Server {
   clients: Record<UserID, Socket> = {} as any;
-  roomOf: Record<UserID, Room> = {} as any;
+  roomOf: Record<UserID, RoomID> = {} as any;
   rooms: Record<RoomID, Room> = {} as any;
   socket: IOServer;
 
   constructor(server: HTTPServer) {
     this.socket = new IOServer(server);
 
-    this.socket.on("connect", (socket) => {
-      this.clients[socket.id] = socket;
-      console.log(`join client ${socket.id}`);
+    this.socket.on("connect", (client) => {
+      this.clients[client.id] = client;
+      console.log(`join client ${client.id}`);
 
-      socket.on("join", (room) => this.join(socket.id, room));
-      socket.on("rename", (name) => this.rename(socket.id, name));
-      socket.on("event", (event) => this.event(socket.id, event));
-      socket.on("disconnect", () => this.disconnect(socket.id));
+      client.on("join", (room, name) => this.join(client.id, room, name));
+      client.on("event", (event) => this.event(client.id, event));
+      client.on("rename", (name) => this.rename(client.id, name));
+      client.on("disconnect", () => this.leave(client.id));
     });
   }
 
-  join(user: UserID, room: RoomID): void {}
-  event(user: UserID, event: P.Event): void {}
-  rename(user: UserID, name: string): void {}
-  disconnect(user: UserID): void {}
-  close(room: RoomID): void {}
+  userAndRoom(
+    id: UserID
+  ): {
+    user: P.User;
+    room: RoomID;
+  } {
+    const room = this.roomOf[id];
+    assert.notStrictEqual(this.rooms[room], undefined);
+    const user = this.rooms[room].findUser(id);
+    assert.notStrictEqual(user, null);
+    return { user, room };
+  }
+
+  join(id: UserID, room: RoomID, name: string): void {
+    const user: P.User = { id, name };
+    if (this.rooms[room] === undefined) {
+      this.rooms[room] = new Room(room, this.socket, this.close, 6);
+    }
+    this.clients[id].join(room);
+    this.rooms[room].join(user);
+    this.roomOf[id] = room;
+  }
+
+  event(id: UserID, event: P.Event): void {
+    const { user, room } = this.userAndRoom(id);
+    this.rooms[room].update(user, event);
+  }
+
+  rename(id: UserID, name: string): void {
+    const { user, room } = this.userAndRoom(id);
+    this.rooms[room].rename(user, name);
+  }
+
+  leave(id: UserID): void {
+    const { user, room } = this.userAndRoom(id);
+    this.rooms[room].leave(user);
+  }
+
+  close(room: RoomID): void {
+    assert.notStrictEqual(this.rooms[room], undefined);
+    delete this.rooms[room];
+  }
 }

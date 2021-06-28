@@ -140,8 +140,6 @@ export class Engine extends Data {
     if (seat !== null) {
       this.unseatAt(seat);
     }
-    // pass host handling up to server?
-    // removeUser(user: UserID, newHost: UserID): void
     if (user === this.host) {
       this.host = null;
       for (const seat of this.seats) {

@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 
 import { Engine } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
+import { RoomID } from "lib/server";
 
 export class Client {
   engine: Engine | null = null;
@@ -18,20 +19,17 @@ export class Client {
     });
   }
 
-  connect(): void {
-    this.status = "connected";
-    this.socket.on("event", (event: P.Event) => {
-      switch (event.type) {
-        case "addUser":
-          return this.addUser(event);
-      }
-    });
+  join(room: RoomID): void {
+    this.socket.emit("");
   }
 
-  addUser(event: P.AddUser): void {}
+  leave(): void {}
+
+  rename(): void {}
 
   // on connect, say hi and don the identity
   // protocol actions are join, leave, rename
   // take reset from above
   // take events from above
+  // send events
 }
