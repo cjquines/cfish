@@ -93,7 +93,6 @@ export class Room {
   // forward redacted state to client
   reset(user: P.User): void {
     const res = this.engine.redactFor(user.id);
-    // cross your fingers and hope this serializes properly
     this.socket.to(user.id).emit("reset", res);
   }
 

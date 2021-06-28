@@ -22,10 +22,11 @@ export namespace CFish {
 }
 
 export class Data {
+  numPlayers: number;
+
   phase: CFish.Phase = CFish.Phase.WAIT;
   // all users in the room
-  // TODO: change this to not set so it's serializable
-  users: Set<UserID> = new Set();
+  users: UserID[] = [];
   // whose data is this? null is server
   identity: UserID | null = null;
   host: UserID | null = null;
@@ -114,8 +115,10 @@ export class Engine extends Data {
   }
 
   // dupe and redact state
-  redactFor(user: UserID): Engine {
-    const res = new Engine(this.numPlayers);
+  redactFor(user: UserID): Data {
+    const res = new Data();
+    res.numPlayers = this.numPlayers;
+
     res.phase = this.phase;
     res.users = this.users;
     res.identity = user;
@@ -144,13 +147,13 @@ export class Engine extends Data {
   // protocol actions
 
   addUser(user: UserID): void {
-    assert.isNotOk(this.users.has(user));
-    this.users.add(user);
+    assert.isNotOk(this.users.includes(user));
+    this.users.push(user);
     if (this.host === null) this.host = user;
   }
 
   seatAt(user: UserID, seat: SeatID): void {
-    assert.isOk(this.users.has(user));
+    assert.isOk(this.users.includes(user));
     assert.strictEqual(this.userOf[seat], null);
     assert.strictEqual(this.seatOf(user), null);
     this.userOf[seat] = user;
@@ -162,8 +165,8 @@ export class Engine extends Data {
   }
 
   removeUser(user: UserID): void {
-    assert.isOk(this.users.has(user));
-    this.users.delete(user);
+    assert.isOk(this.users.includes(user));
+    _.remove(this.users, (user_) => user_ === user);
 
     const seat = this.seatOf(user);
     if (seat !== null) {
