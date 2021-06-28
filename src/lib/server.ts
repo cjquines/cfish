@@ -92,12 +92,13 @@ export class Room {
 
   // forward redacted state to client
   reset(user: P.User): void {
-    const res = this.engine.redactFor(user.id);
-    this.socket.to(user.id).emit("reset", res);
+    const data = this.engine.redactFor(user.id);
+    this.socket.to(user.id).emit("reset", data);
   }
 
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
+    this.event(event);
     switch (event.type) {
       case "seatAt":
         this.engine.seatAt(event.user, event.seat);
