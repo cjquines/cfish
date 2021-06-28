@@ -24,7 +24,7 @@ describe("Engine", () => {
     engine.removeUser("g");
     engine.unseatAt(5);
 
-    engine.users.size.should.equal(6);
+    engine.users.length.should.equal(6);
     (() => engine.seatAt("f", 0)).should.throw();
     (() => engine.seatAt("f", 6)).should.throw();
     (() => engine.seatAt("a", 1)).should.throw();
@@ -34,7 +34,7 @@ describe("Engine", () => {
     engine.removeUser("a");
     engine.removeUser("b");
 
-    engine.users.size.should.equal(4);
+    engine.users.length.should.equal(4);
     engine.numSeated.should.equal(4);
     engine.host.should.equal("c");
     engine.seats.should.deep.equal([2, 3, 4, 5, 0, 1]);
