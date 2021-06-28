@@ -32,6 +32,7 @@ export namespace Protocol {
   export type StartGame = {
     type: "startGame";
     seat: SeatID;
+    shuffle?: boolean;
   };
 
   export type StartGameResponse = {

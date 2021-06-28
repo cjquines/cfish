@@ -2,6 +2,7 @@ import { assert } from "chai";
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 
+import { Card } from "lib/cards";
 import { Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 
@@ -48,6 +49,7 @@ export class Room {
 
   join(user: P.User): void {
     assert.strictEqual(this.findUser(user.id), null);
+    this.socket.to(user.id).emit("users", this.users);
     this.users.push(user);
 
     this.engine.addUser(user.id);
@@ -108,7 +110,7 @@ export class Room {
         this.engine.unseatAt(event.seat);
         return;
       case "startGame":
-        this.engine.startGame(event.seat);
+        this.engine.startGame(event.seat, event?.shuffle);
         this.event({
           type: "startGameResponse",
           server: null,
@@ -125,7 +127,8 @@ export class Room {
         }
         return;
       case "ask":
-        this.engine.ask(event.asker, event.askee, event.card);
+        const card = new Card(event.card.cardSuit, event.card.rank);
+        this.engine.ask(event.asker, event.askee, card);
         return;
       case "answer":
         this.engine.answer(event.askee, event.response);

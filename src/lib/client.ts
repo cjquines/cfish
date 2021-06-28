@@ -1,6 +1,7 @@
 import { assert } from "chai";
 import { io, Socket } from "socket.io-client";
 
+import { Card, Hand } from "lib/cards";
 import { Data, Engine } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 import { RoomID, UserID } from "lib/server";
@@ -20,6 +21,9 @@ export class Client {
       this.socket.emit("join", room, name);
     });
 
+    this.socket.on("users", (users) => {
+      this.users = users;
+    });
     this.socket.on("join", (user) => this.join(user));
     this.socket.on("reset", (data) => this.reset(data));
     this.socket.on("event", (event) => this.update(event));
@@ -67,7 +71,11 @@ export class Client {
     this.engine.userOf = data.userOf;
     this.engine.declarerOf = data.declarerOf;
 
-    this.engine.handOf = data.handOf;
+    for (const seat of data.seats) {
+      this.engine.handOf[seat] = data.handOf[seat]
+        ? new Hand(data.handOf[seat])
+        : null;
+    }
     this.engine.handSize = data.handSize;
 
     this.engine.asker = data.asker;
@@ -80,6 +88,7 @@ export class Client {
 
   // process event from server
   update(event: P.Event): void {
+    if (this.engine === null) return;
     switch (event.type) {
       case "addUser":
         this.engine.addUser(event.user);
@@ -104,7 +113,8 @@ export class Client {
         );
         return;
       case "ask":
-        this.engine.ask(event.asker, event.askee, event.card);
+        const card = new Card(event.card.cardSuit, event.card.rank);
+        this.engine.ask(event.asker, event.askee, card);
         return;
       case "answer":
         this.engine.answer(event.askee, event.response);

@@ -219,8 +219,8 @@ export class Engine extends Data {
     hand: Hand | null,
     handSizes: Record<SeatID, number>
   ): void {
-    if (this.ownSeat !== null) {
-      this.handOf[this.ownSeat] = hand;
+    if (this.ownSeat !== null && hand !== null) {
+      this.handOf[this.ownSeat] = new Hand(hand);
     }
     this.handSize = handSizes;
   }

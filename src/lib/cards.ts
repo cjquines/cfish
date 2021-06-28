@@ -184,11 +184,19 @@ export function* genFishSuit(suit: FishSuit): Generator<Card, void> {
 }
 
 export class Hand {
-  private cards: Card[] = [];
+  readonly cards: Card[] = [];
 
-  constructor(cards: Iterable<Card>) {
-    for (const card of cards) {
-      this.insert(card);
+  constructor(cards: Iterable<Card> | Hand) {
+    if ("cards" in cards) {
+      // clone constructor
+      for (const card of cards.cards) {
+        this.insert(new Card(card.cardSuit, card.rank));
+      }
+    } else {
+      // iterable case
+      for (const card of cards) {
+        this.insert(card);
+      }
     }
   }
 
