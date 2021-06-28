@@ -67,7 +67,7 @@ export namespace Protocol {
   };
 
   export type DeclareResponse = {
-    type: "DeclareResponse";
+    type: "declareResponse";
     server: null;
     correct: boolean;
     handSizes: Record<SeatID, number>;

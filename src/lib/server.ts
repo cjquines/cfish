@@ -99,7 +99,49 @@ export class Room {
 
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
-    // special casing on some events with responses
+    switch (event.type) {
+      case "seatAt":
+        this.engine.seatAt(event.user, event.seat);
+        return;
+      case "unseatAt":
+        this.engine.unseatAt(event.seat);
+        return;
+      case "startGame":
+        this.engine.startGame(event.seat);
+        this.event({
+          type: "startGameResponse",
+          server: null,
+          hand: null,
+          handSizes: this.engine.handSize,
+        });
+        for (const seat of this.engine.seats) {
+          this.toSeat(seat, {
+            type: "startGameResponse",
+            server: null,
+            hand: this.engine.handOf[seat],
+            handSizes: this.engine.handSize,
+          });
+        }
+        return;
+      case "ask":
+        this.engine.ask(event.asker, event.askee, event.card);
+        return;
+      case "answer":
+        this.engine.answer(event.askee, event.response);
+        return;
+      case "initDeclare":
+        this.engine.initDeclare(event.declarer, event.declaredSuit);
+        return;
+      case "declare":
+        const correct = this.engine.declare(event.declarer, event.owners);
+        this.event({
+          type: "declareResponse",
+          server: null,
+          correct: correct,
+          handSizes: this.engine.handSize,
+        });
+        return;
+    }
   }
 }
 
