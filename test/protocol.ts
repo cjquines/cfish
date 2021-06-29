@@ -92,9 +92,7 @@ describe("Client/Server", () => {
     let run = false;
     clients[0].socket.on("event", (event) => {
       if (run) return;
-      console.log(event);
       run = true;
-      console.log(clients[0].engine.toString());
       done();
     });
 
@@ -105,5 +103,27 @@ describe("Client/Server", () => {
       askee: 1,
       card: C.C_3,
     });
+  });
+
+  it("runs an answer", (done) => {
+    let run = false;
+    clients[2].socket.on("event", (event) => {
+      if (run) return;
+      run = true;
+      done();
+    });
+
+    clients[1].attempt({
+      type: "answer",
+      askee: 1,
+      response: true,
+    });
+  });
+
+  it("runs an answer correctly", () => {
+    clients[0].engine.handOf[0].cards[9].should.deep.equal(C.C_3);
+    clients[1].engine.handOf[1].cards[0].should.deep.equal(C.C_9);
+    clients[2].engine.handSize[0].should.equal(10);
+    clients[2].engine.handSize[1].should.equal(8);
   });
 });

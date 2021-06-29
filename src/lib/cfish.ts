@@ -362,7 +362,7 @@ export class Engine extends Data {
     }
     res += "[hands]\n";
     for (const seat of this.seats) {
-      res += ` ${seat}: ${this.handOf[seat]}\n`;
+      res += ` ${seat}: ${this.handOf[seat] ?? this.handSize[seat]}\n`;
     }
     return res;
   }
