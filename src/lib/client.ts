@@ -1,8 +1,8 @@
 import { assert } from "chai";
 import { io, Socket } from "socket.io-client";
 
-import { Card, Hand } from "lib/cards";
-import { Data, Engine } from "lib/cfish";
+import { Card, FishSuit, Hand } from "lib/cards";
+import { Data, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 import { RoomID, UserID } from "lib/server";
 
@@ -135,8 +135,67 @@ export class Client {
     }
   }
 
+  // convenience actions
+
   // we don't need to apply it to our own engine; server will update us
+  // TODO do we want to predict?
   attempt(event: P.Event): void {
     this.socket.emit("event", event);
+  }
+
+  seatAt(seat: SeatID): void {
+    return this.attempt({
+      type: "seatAt",
+      user: this.engine.identity,
+      seat: seat,
+    });
+  }
+
+  unseatAt(): void {
+    return this.attempt({
+      type: "unseatAt",
+      seat: this.engine.ownSeat,
+    });
+  }
+
+  startGame(shuffle: boolean = true): void {
+    return this.attempt({
+      type: "startGame",
+      seat: this.engine.ownSeat,
+      shuffle: shuffle,
+    });
+  }
+
+  ask(askee: SeatID, card: Card): void {
+    return this.attempt({
+      type: "ask",
+      asker: this.engine.ownSeat,
+      askee: askee,
+      card: card,
+    });
+  }
+
+  answer(response: boolean): void {
+    return this.attempt({
+      type: "answer",
+      askee: this.engine.ownSeat,
+      response: response,
+    });
+  }
+
+  initDeclare(declaredSuit: FishSuit): void {
+    return this.attempt({
+      type: "initDeclare",
+      declarer: this.engine.ownSeat,
+      declaredSuit: declaredSuit,
+    });
+  }
+
+  declare(owners: Record<string, SeatID>): void {
+    return this.attempt({
+      type: "declare",
+      declarer: this.engine.ownSeat,
+      owners: owners,
+    });
   }
 }
