@@ -16,7 +16,7 @@ export class Room {
   constructor(
     readonly id: RoomID,
     readonly socket: IOServer,
-    public closeCallback: (RoomID) => void,
+    public closeCallback: () => void,
     numPlayers: number
   ) {
     this.engine = new Engine(numPlayers);
@@ -89,7 +89,7 @@ export class Room {
     while (this.users.length > 0) {
       this.leave(this.users[0]);
     }
-    this.closeCallback(this.id);
+    this.closeCallback();
   }
 
   // forward redacted state to client
@@ -186,7 +186,7 @@ export class Server {
   join(id: UserID, room: RoomID, name: string): void {
     const user: P.User = { id, name };
     if (this.rooms[room] === undefined) {
-      this.rooms[room] = new Room(room, this.socket, this.close, 6);
+      this.rooms[room] = new Room(room, this.socket, () => this.close(room), 6);
     }
     this.clients[id].join(room);
     this.rooms[room].join(user);
