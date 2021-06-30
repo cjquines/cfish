@@ -29,6 +29,7 @@ export class App extends React.Component<App.Props, App.State> {
   componentDidMount() {
     if (this.state.client !== null) return;
     const client = new Client(this.props.url, this.state.room, this.state.name);
+    client.onUpdate = (client: Client) => this.setState({ client });
     this.setState({ client });
   }
 
@@ -38,6 +39,9 @@ export class App extends React.Component<App.Props, App.State> {
         <div className="game">
           <div className="table">
             <div className="players">
+              <p>
+                {this.state.client?.users.map((user) => user.name).join(" ")}
+              </p>
               <div className="player">
                 <div className="playerInt">Player 1</div>
               </div>

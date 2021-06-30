@@ -12,6 +12,7 @@ export class Client {
   socket: Socket;
   status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
+  onUpdate: (state: this) => void | null;
 
   constructor(readonly url: string, public room: RoomID, public name: string) {
     this.socket = io(url);
@@ -41,11 +42,13 @@ export class Client {
       this.identity = user;
     }
     this.users.push(user);
+    this.onUpdate?.(this);
   }
 
   rename(user: P.User, name: string): void {
     const user_ = this.findUser(user.id);
     user_.name = name;
+    this.onUpdate?.(this);
   }
 
   leave(user: P.User): void {
@@ -54,6 +57,7 @@ export class Client {
     if (this.socket.id === user.id) {
       this.status = "disconnected";
     }
+    this.onUpdate?.(this);
   }
 
   // get redacted state and initiate engine
@@ -84,6 +88,8 @@ export class Client {
 
     this.engine.declarer = data.declarer;
     this.engine.declaredSuit = data.declaredSuit;
+
+    this.onUpdate?.(this);
   }
 
   // process event from server
@@ -92,47 +98,48 @@ export class Client {
     switch (event.type) {
       case "addUser":
         this.engine.addUser(event.user);
-        return;
+        break;
       case "seatAt":
         this.engine.seatAt(event.user, event.seat);
-        return;
+        break;
       case "unseatAt":
         this.engine.unseatAt(event.seat);
-        return;
+        break;
       case "removeUser":
         this.engine.removeUser(event.user);
-        return;
+        break;
       case "startGame":
         this.engine.startGame(event.seat);
-        return;
+        break;
       case "startGameResponse":
         this.engine.startGameResponse(
           event.server,
           event.hand,
           event.handSizes
         );
-        return;
+        break;
       case "ask":
         const card = new Card(event.card.cardSuit, event.card.rank);
         this.engine.ask(event.asker, event.askee, card);
-        return;
+        break;
       case "answer":
         this.engine.answer(event.askee, event.response);
-        return;
+        break;
       case "initDeclare":
         this.engine.initDeclare(event.declarer, event.declaredSuit);
-        return;
+        break;
       case "declare":
         this.engine.declare(event.declarer, event.owners);
-        return;
+        break;
       case "declareResponse":
         this.engine.declareResponse(
           event.server,
           event.correct,
           event.handSizes
         );
-        return;
+        break;
     }
+    this.onUpdate?.(this);
   }
 
   // convenience actions
