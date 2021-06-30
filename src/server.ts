@@ -1,7 +1,6 @@
 const express = require("express");
 const app = express();
-
-const Server = require("./lib/server.ts").Server;
+const Server = require("lib/server").Server;
 
 const isDev = process.env.NODE_ENV !== "production";
 

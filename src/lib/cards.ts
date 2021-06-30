@@ -1,4 +1,4 @@
-import assert from "assert/strict";
+import { assert } from "chai";
 import _ from "lodash";
 
 export enum CardSuit {
