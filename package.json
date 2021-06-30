@@ -5,8 +5,8 @@
   "main": "dist/server/main.js",
   "scripts": {
     "build": "NODE_ENV=production webpack",
-    "start": "NODE_ENV=production node src/server.js",
-    "dev": "node src/server.js",
+    "start": "NODE_ENV=production ts-node --transpile-only src/server.ts",
+    "dev": "tsnd --respawn --require tsconfig-paths/register src/server.ts",
     "test": "mocha",
     "test-watch": "mocha -w"
   },
@@ -43,6 +43,7 @@
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.1.7",
     "tsconfig-paths": "^3.9.0",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.2",

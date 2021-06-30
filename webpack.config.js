@@ -44,7 +44,7 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(js|jsx)$/,
+        test: /\.jsx?$/,
         use: "react-hot-loader/webpack",
         include: /node_modules/,
       },
