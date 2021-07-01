@@ -100,7 +100,9 @@ export class Room {
 
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
+    const seat = this.engine.seatOf(user.id);
     this.event(event);
+
     switch (event.type) {
       case "seatAt":
         this.engine.seatAt(event.user, event.seat);
@@ -110,6 +112,7 @@ export class Room {
         this.engine.unseatAt(event.seat);
         return;
       case "startGame":
+        assert.strictEqual(seat, event.seat);
         this.engine.startGame(event.seat, event?.shuffle);
         this.event({
           type: "startGameResponse",
@@ -127,16 +130,20 @@ export class Room {
         }
         return;
       case "ask":
+        assert.strictEqual(seat, event.asker);
         const card = new Card(event.card.cardSuit, event.card.rank);
         this.engine.ask(event.asker, event.askee, card);
         return;
       case "answer":
+        assert.strictEqual(seat, event.askee);
         this.engine.answer(event.askee, event.response);
         return;
       case "initDeclare":
+        assert.strictEqual(seat, event.declarer);
         this.engine.initDeclare(event.declarer, event.declaredSuit);
         return;
       case "declare":
+        assert.strictEqual(seat, event.declarer);
         const correct = this.engine.declare(event.declarer, event.owners);
         this.event({
           type: "declareResponse",
