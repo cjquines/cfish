@@ -17,11 +17,6 @@ export class Client {
   constructor(readonly url: string, public room: RoomID, public name: string) {
     this.socket = io(url);
 
-    this.socket.on("connect", () => {
-      this.status = "connected";
-      this.socket.emit("join", room, name);
-    });
-
     this.socket.on("users", (users) => {
       this.users = users;
     });
@@ -35,6 +30,13 @@ export class Client {
   findUser(id: UserID): P.User | null {
     const res = this.users.filter((user) => user.id === id);
     return res.length === 1 ? res[0] : null;
+  }
+
+  connect(): void {
+    this.socket.on("connect", () => {
+      this.status = "connected";
+      this.socket.emit("join", this.room, this.name);
+    });
   }
 
   join(user: P.User): void {

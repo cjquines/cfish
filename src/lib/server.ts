@@ -191,6 +191,7 @@ export class Server {
     this.clients[id].join(room);
     this.rooms[room].join(user);
     this.roomOf[id] = room;
+    this.reset(id);
   }
 
   reset(id: UserID): void {

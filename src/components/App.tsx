@@ -30,10 +30,16 @@ export class App extends React.Component<App.Props, App.State> {
     if (this.state.client !== null) return;
     const client = new Client(this.props.url, this.state.room, this.state.name);
     client.onUpdate = (client: Client) => this.setState({ client });
+    client.connect();
     this.setState({ client });
   }
 
   render() {
+    const { client } = this.state;
+    if (!client?.engine) {
+      return <div className="wrapper">loading...</div>;
+    }
+
     return (
       <div className="wrapper">
         <div className="game">
