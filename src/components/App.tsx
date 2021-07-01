@@ -2,6 +2,7 @@ import React from "react";
 
 import { Players } from "components/Players";
 import { Question } from "components/Question";
+import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
 export namespace App {
@@ -47,6 +48,18 @@ export class App extends React.Component<App.Props, App.State> {
           <div className="table">
             <Players client={client} />
             <Question from="p1" to="p6" label="3S" />
+          </div>
+          <div className="action">
+            <button
+              onClick={(e) => client.startGame()}
+              disabled={
+                client.engine.phase !== C.Phase.WAIT ||
+                client.engine.identity !== client.engine.host ||
+                client.engine.numSeated < client.engine.numPlayers
+              }
+            >
+              start game
+            </button>
           </div>
           <div className="hand">
             <div className="cardarea">

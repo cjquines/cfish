@@ -180,13 +180,11 @@ export class Server {
   userAndRoom(
     id: UserID
   ): {
-    user: P.User;
-    room: RoomID;
+    user: P.User | null;
+    room: RoomID | null;
   } {
-    const room = this.roomOf[id];
-    assert.notStrictEqual(this.rooms[room], undefined);
-    const user = this.rooms[room].findUser(id);
-    assert.notStrictEqual(user, null);
+    const room = this.roomOf[id] ?? null;
+    const user = this.rooms[room]?.findUser(id);
     return { user, room };
   }
 
