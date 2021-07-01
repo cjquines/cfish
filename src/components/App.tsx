@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { Client } from "lib/client";
 
@@ -44,29 +45,7 @@ export class App extends React.Component<App.Props, App.State> {
       <div className="wrapper">
         <div className="game">
           <div className="table">
-            <div className="players">
-              <p>
-                {this.state.client?.users.map((user) => user.name).join(" ")}
-              </p>
-              <div className="player">
-                <div className="playerInt">Player 1</div>
-              </div>
-              <div className="player">
-                <div className="playerInt">Player 2</div>
-              </div>
-              <div className="player">
-                <div className="playerInt">Player 3</div>
-              </div>
-              <div className="player">
-                <div className="playerInt">Player 4</div>
-              </div>
-              <div className="player">
-                <div className="playerInt">Player 5</div>
-              </div>
-              <div className="player">
-                <div className="playerInt">Player 6</div>
-              </div>
-            </div>
+            <Players client={client} />
             <Question from="p1" to="p6" label="3S" />
           </div>
           <div className="hand">

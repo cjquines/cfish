@@ -32,6 +32,11 @@ export class Client {
     return res.length === 1 ? res[0] : null;
   }
 
+  nameOf(id: UserID): string | null {
+    const user = this.findUser(id);
+    return user ? user.name : null;
+  }
+
   connect(): void {
     this.socket.on("connect", () => {
       this.status = "connected";
