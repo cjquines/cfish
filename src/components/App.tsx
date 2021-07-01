@@ -49,7 +49,7 @@ export class App extends React.Component<App.Props, App.State> {
         <div className="game">
           <div className="table">
             <Players client={client} />
-            <Question from="p1" to="p6" label="3S" />
+            <Question client={client} />
           </div>
           <div className="action">
             <button

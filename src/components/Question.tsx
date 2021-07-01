@@ -7,6 +7,9 @@ import {
   ValidLineStyles,
 } from "react-archer";
 
+import { SeatID } from "lib/cfish";
+import { Client } from "lib/client";
+
 // a target for react-archer
 
 namespace PlayerTarget {
@@ -35,26 +38,25 @@ class PlayerTarget extends React.Component<PlayerTarget.Props> {
 
 export namespace Question {
   export type Props = {
-    from: string;
-    to: string;
-    label: string;
+    client: Client;
     [more: string]: any;
   };
 }
 
 export class Question extends React.Component<Question.Props> {
   render() {
-    const { from, to, label, ...props } = this.props;
+    const { client, ...props } = this.props;
+    const { engine } = client;
 
-    const relations = (id: string) =>
-      id !== from
+    const relations = (id: SeatID) =>
+      id !== engine.asker || engine.askee === null
         ? []
         : [
             {
-              targetId: to,
+              targetId: String(engine.askee),
               targetAnchor: "top" as AnchorPosition,
               sourceAnchor: "top" as AnchorPosition,
-              label: <div className="label">{label}</div>,
+              label: <div className="label">{engine.askedCard.toString()}</div>,
               style: {
                 lineStyle: "straight" as ValidLineStyles,
               },
@@ -64,11 +66,11 @@ export class Question extends React.Component<Question.Props> {
     return (
       <div className="question">
         <ArcherContainer strokeColor="black">
-          {["p1", "p2", "p3", "p4", "p5", "p6"].map((id, i) => (
+          {engine.seats.map((seat) => (
             <PlayerTarget
-              key={i}
-              id={id}
-              relations={relations(id)}
+              key={seat}
+              id={String(seat)}
+              relations={relations(seat)}
               {...props}
             />
           ))}
