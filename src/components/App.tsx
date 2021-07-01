@@ -62,6 +62,26 @@ export class App extends React.Component<App.Props, App.State> {
             >
               start game
             </button>
+            <button
+              onClick={(e) => client.answer(true)}
+              disabled={
+                engine.phase !== C.Phase.ANSWER ||
+                engine.ownSeat !== engine.askee ||
+                !engine.handOf[engine.ownSeat]?.includes(engine.askedCard)
+              }
+            >
+              yes
+            </button>
+            <button
+              onClick={(e) => client.answer(false)}
+              disabled={
+                engine.phase !== C.Phase.ANSWER ||
+                engine.ownSeat !== engine.askee ||
+                engine.handOf[engine.ownSeat]?.includes(engine.askedCard)
+              }
+            >
+              no
+            </button>
           </div>
           <div className="hand">
             <div className="cardarea">
