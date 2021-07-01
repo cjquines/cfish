@@ -42,6 +42,8 @@ export class App extends React.Component<App.Props, App.State> {
       return <div className="wrapper">loading...</div>;
     }
 
+    const { engine } = client;
+
     return (
       <div className="wrapper">
         <div className="game">
@@ -53,9 +55,9 @@ export class App extends React.Component<App.Props, App.State> {
             <button
               onClick={(e) => client.startGame()}
               disabled={
-                client.engine.phase !== C.Phase.WAIT ||
-                client.engine.identity !== client.engine.host ||
-                client.engine.numSeated < client.engine.numPlayers
+                engine.phase !== C.Phase.WAIT ||
+                engine.identity !== engine.host ||
+                engine.numSeated < engine.numPlayers
               }
             >
               start game
@@ -63,15 +65,9 @@ export class App extends React.Component<App.Props, App.State> {
           </div>
           <div className="hand">
             <div className="cardarea">
-              <div className="card">1</div>
-              <div className="card">2</div>
-              <div className="card">3</div>
-              <div className="card">4</div>
-              <div className="card">5</div>
-              <div className="card">6</div>
-              <div className="card">7</div>
-              <div className="card">8</div>
-              <div className="card">9</div>
+              {engine.handOf[engine.ownSeat]?.cards.map((card) => (
+                <div className="card">{card.toString()}</div>
+              ))}
             </div>
           </div>
         </div>
