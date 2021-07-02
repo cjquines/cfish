@@ -18,6 +18,7 @@ describe("Client/Server", () => {
       const port = (http.address() as any).port;
       url = `http://localhost:${port}`;
       clients.push(new Client(url, "test", "a"));
+      clients[0].connect();
       clients[0].socket.on("connect", () => done());
     });
   });
@@ -49,6 +50,9 @@ describe("Client/Server", () => {
     clients.push(new Client(url, "test", "d"));
     clients.push(new Client(url, "test", "e"));
     clients.push(new Client(url, "test", "f"));
+    for (let i = 1; i < 6; i++) {
+      clients[i].connect();
+    }
 
     let count = 1;
     clients[0].socket.on("join", () => {
