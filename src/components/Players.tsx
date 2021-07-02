@@ -56,7 +56,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
         {engine.seats.map((seat) => (
           <div className="player" key={seat}>
             <div className="playerInt">
-              {`${client.nameOf(engine.userOf[seat]) ?? "empty"} (${
+              {`${client.nameOf(seat) ?? "empty"} (${
                 engine.handSize[seat]
               })`}
               {engine.ownSeat !== null ? (

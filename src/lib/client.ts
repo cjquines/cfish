@@ -27,12 +27,15 @@ export class Client {
     this.socket.on("leave", (user) => this.leave(user));
   }
 
-  findUser(id: UserID): P.User | null {
-    const res = this.users.filter((user) => user.id === id);
+  findUser(id: UserID | SeatID): P.User | null {
+    const res =
+      typeof id === "string" // true iff UserID
+        ? this.users.filter((user) => user.id === id)
+        : this.users.filter((user) => user.id === this.engine.userOf[id]);
     return res.length === 1 ? res[0] : null;
   }
 
-  nameOf(id: UserID): string | null {
+  nameOf(id: UserID | SeatID): string | null {
     const user = this.findUser(id);
     return user ? user.name : null;
   }

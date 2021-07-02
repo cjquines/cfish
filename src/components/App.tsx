@@ -1,5 +1,6 @@
 import React from "react";
 
+import { Action } from "components/Action";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { CFish as C } from "lib/cfish";
@@ -23,7 +24,7 @@ export class App extends React.Component<App.Props, App.State> {
 
     this.state = {
       client: null,
-      name: window.prompt("enter your name") || "no name",
+      name: window.prompt("enter your name") ?? "no name",
       room: "test",
     };
   }
@@ -51,38 +52,7 @@ export class App extends React.Component<App.Props, App.State> {
             <Players client={client} />
             <Question client={client} />
           </div>
-          <div className="action">
-            <button
-              onClick={(e) => client.startGame()}
-              disabled={
-                engine.phase !== C.Phase.WAIT ||
-                engine.identity !== engine.host ||
-                engine.numSeated < engine.numPlayers
-              }
-            >
-              start game
-            </button>
-            <button
-              onClick={(e) => client.answer(true)}
-              disabled={
-                engine.phase !== C.Phase.ANSWER ||
-                engine.ownSeat !== engine.askee ||
-                !engine.handOf[engine.ownSeat]?.includes(engine.askedCard)
-              }
-            >
-              yes
-            </button>
-            <button
-              onClick={(e) => client.answer(false)}
-              disabled={
-                engine.phase !== C.Phase.ANSWER ||
-                engine.ownSeat !== engine.askee ||
-                engine.handOf[engine.ownSeat]?.includes(engine.askedCard)
-              }
-            >
-              no
-            </button>
-          </div>
+          <Action client={client} />
           <div className="hand">
             <div className="cardarea">
               {engine.handOf[engine.ownSeat]?.cards.map((card) => (
