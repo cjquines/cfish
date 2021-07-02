@@ -25,6 +25,18 @@ export class Action extends React.Component<Action.Props> {
     }
 
     if (engine.phase === C.Phase.ASK) {
+      if (engine.lastResponse === true) {
+        return `${client.nameOf(
+          engine.askee
+        )} gave the ${engine.askedCard.toString()} to ${client.nameOf(
+          engine.asker
+        )}`;
+      }
+      if (engine.lastResponse === false) {
+        return `${client.nameOf(
+          engine.askee
+        )} did not have the ${engine.askedCard.toString()}`;
+      }
       if (engine.ownSeat === engine.asker) {
         return "ask someone";
       }

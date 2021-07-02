@@ -95,6 +95,7 @@ export class Client {
     this.engine.asker = data.asker;
     this.engine.askee = data.askee;
     this.engine.askedCard = data.askedCard;
+    this.engine.lastResponse = data.lastResponse;
 
     this.engine.declarer = data.declarer;
     this.engine.declaredSuit = data.declaredSuit;

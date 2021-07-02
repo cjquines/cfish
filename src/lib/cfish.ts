@@ -44,12 +44,12 @@ export class Data {
   // hand size; always public
   handSize: Record<SeatID, number> = {} as any;
 
-  // asker asks askedCard from askee
-  // asker valid if phase is ASK / ANSWER / DECLARE
+  // asker asks askedCard from askee, last answer is lastResponse
+  // valid if phase is ASK / ANSWER / DECLARE, initially null
   asker: SeatID | null = null;
-  // askee, askedCard valid if phase is ANSWER
   askee: SeatID | null = null;
   askedCard: Card | null = null;
+  lastResponse: boolean | null = null;
 
   // declarer declares declaredSuit
   // valid if phase is DECLARE
@@ -137,6 +137,7 @@ export class Engine extends Data {
     res.asker = this.asker;
     res.askee = this.askee;
     res.askedCard = this.askedCard;
+    res.lastResponse = this.lastResponse;
 
     res.declarer = this.declarer;
     res.declaredSuit = this.declaredSuit;
@@ -260,9 +261,9 @@ export class Engine extends Data {
       this.handSize[this.asker] += 1;
       this.handSize[this.askee] -= 1;
     }
+    
     this.asker = response ? this.asker : this.askee;
-    this.askee = null;
-    this.askedCard = null;
+    this.lastResponse = response;
     this.phase = CFish.Phase.ASK;
   }
 
