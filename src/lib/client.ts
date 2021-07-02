@@ -94,7 +94,10 @@ export class Client {
 
     this.engine.asker = data.asker;
     this.engine.askee = data.askee;
-    this.engine.askedCard = data.askedCard;
+    this.engine.askedCard = new Card(
+      data.askedCard.cardSuit,
+      data.askedCard.rank
+    );
     this.engine.lastResponse = data.lastResponse;
 
     this.engine.declarer = data.declarer;

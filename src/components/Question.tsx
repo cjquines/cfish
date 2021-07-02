@@ -7,7 +7,7 @@ import {
   ValidLineStyles,
 } from "react-archer";
 
-import { SeatID } from "lib/cfish";
+import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 
 // a target for react-archer
@@ -49,7 +49,7 @@ export class Question extends React.Component<Question.Props> {
     const { engine } = client;
 
     const relations = (id: SeatID) =>
-      id !== engine.asker || engine.askee === null
+      engine.phase !== C.Phase.ANSWER || id !== engine.asker
         ? []
         : [
             {

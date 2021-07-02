@@ -25,6 +25,9 @@ export class Action extends React.Component<Action.Props> {
     }
 
     if (engine.phase === C.Phase.ASK) {
+      if (engine.ownSeat === engine.asker) {
+        return "ask someone";
+      }
       if (engine.lastResponse === true) {
         return `${client.nameOf(
           engine.askee
@@ -36,9 +39,6 @@ export class Action extends React.Component<Action.Props> {
         return `${client.nameOf(
           engine.askee
         )} did not have the ${engine.askedCard.toString()}`;
-      }
-      if (engine.ownSeat === engine.asker) {
-        return "ask someone";
       }
       return `${client.nameOf(engine.asker)} is choosing someone to ask`;
     }

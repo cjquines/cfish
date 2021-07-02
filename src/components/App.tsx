@@ -24,7 +24,7 @@ export class App extends React.Component<App.Props, App.State> {
 
     this.state = {
       client: null,
-      name: window.prompt("enter your name") ?? "no name",
+      name: window.prompt("enter your name") || "no name",
       room: "test",
     };
   }
