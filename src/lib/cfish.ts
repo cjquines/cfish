@@ -84,6 +84,10 @@ export class Engine extends Data {
     return this.seatOf(this.identity);
   }
 
+  get ownHand(): Hand | null {
+    return this.handOf[this.ownSeat] ?? null;
+  }
+
   indexOf(seat: SeatID): number {
     return this.seats.findIndex((seat_) => seat_ === seat);
   }
@@ -261,7 +265,7 @@ export class Engine extends Data {
       this.handSize[this.asker] += 1;
       this.handSize[this.askee] -= 1;
     }
-    
+
     this.asker = response ? this.asker : this.askee;
     this.lastResponse = response;
     this.phase = CFish.Phase.ASK;

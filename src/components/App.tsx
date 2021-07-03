@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Action } from "components/Action";
+import { CardArea } from "components/CardArea";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { CFish as C } from "lib/cfish";
@@ -54,11 +55,7 @@ export class App extends React.Component<App.Props, App.State> {
           </div>
           <Action client={client} />
           <div className="hand">
-            <div className="cardarea">
-              {engine.handOf[engine.ownSeat]?.cards.map((card) => (
-                <div className="card">{card.toString()}</div>
-              ))}
-            </div>
+          <CardArea client={client} />
           </div>
         </div>
       </div>

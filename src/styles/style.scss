@@ -78,10 +78,10 @@
 .hand {
   min-height: 10rem;
 
-  .cardarea {
+  .cardArea {
     display: flex;
 
-    > * {
+    .card {
       background-color: #ddd;
       display: block;
       height: 5rem;

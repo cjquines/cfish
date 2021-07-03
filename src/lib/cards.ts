@@ -226,7 +226,18 @@ export class Hand {
     return this.cards.some((card) => card.fishSuit === fishSuit);
   }
 
+  move(from: number, to: number): void {
+    const [card] = this.cards.splice(from, 1);
+    this.cards.splice(to, 0, card);
+  }
+
+  sort(): void {
+    this.cards.sort((a, b) => a.compare(b));
+  }
+
   toString(): string {
-    return this.cards.sort((a, b) => a.compare(b)).join(" ");
+    const copy = new Hand(this.cards);
+    copy.sort();
+    return copy.cards.join(" ");
   }
 }
