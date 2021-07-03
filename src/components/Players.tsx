@@ -6,7 +6,7 @@ import { Client } from "lib/client";
 
 export namespace CardSelector {
   export type Props = {
-    callback: (Card) => void;
+    callback: (card: Card) => void;
     close: () => void;
   };
 }
