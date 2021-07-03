@@ -16,7 +16,7 @@ export class CardSelector extends React.Component<CardSelector.Props> {
     return (
       <div className="cardSelector">
         {[...genDeck()].map((card) => (
-          <button onClick={(e) => this.props.callback(card)}>
+          <button key={card.toString()} onClick={(e) => this.props.callback(card)}>
             {card.toString()}
           </button>
         ))}

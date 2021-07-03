@@ -167,7 +167,6 @@ export class Server {
 
     this.socket.on("connect", (client) => {
       this.clients[client.id] = client;
-      console.log(`join client ${client.id}`);
 
       client.on("join", (room, name) => this.join(client.id, room, name));
       client.on("reset", () => this.reset(client.id));

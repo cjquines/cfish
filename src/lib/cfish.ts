@@ -292,7 +292,7 @@ export class Engine extends Data {
     let correct = true;
 
     for (const card of genFishSuit(this.declaredSuit)) {
-      const owner = owners[String(card)];
+      const owner = owners[card.toString()];
       assert.notStrictEqual(owner, undefined);
       assert.strictEqual(team, this.teamOf(owner));
       if (this.handOf[owner] !== null) {
@@ -323,6 +323,7 @@ export class Engine extends Data {
     const scorer = correct ? team : 1 - team;
 
     this.declarerOf[this.declaredSuit] = scorer as CFish.Team;
+    this.handSize = handSizes;
 
     if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
       // they win, hooray? what else?
