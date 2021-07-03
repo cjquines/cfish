@@ -1,5 +1,6 @@
 import React from "react";
 
+import { fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
@@ -25,17 +26,27 @@ export class Action extends React.Component<Action.Props> {
     }
 
     if (engine.phase === C.Phase.ASK) {
+      if (engine.lastResponse === "good declare") {
+        return `${client.nameOf(
+          engine.declarer
+        )} correctly declared ${fishSuitToString(engine.declaredSuit)}`;
+      }
+      if (engine.lastResponse === "bad declare") {
+        return `${client.nameOf(
+          engine.declarer
+        )} incorrectly declared ${fishSuitToString(engine.declaredSuit)}`;
+      }
       if (engine.ownSeat === engine.asker) {
         return "ask someone";
       }
-      if (engine.lastResponse === true) {
+      if (engine.lastResponse === "good ask") {
         return `${client.nameOf(
           engine.askee
         )} gave the ${engine.askedCard.toString()} to ${client.nameOf(
           engine.asker
         )}`;
       }
-      if (engine.lastResponse === false) {
+      if (engine.lastResponse === "bad ask") {
         return `${client.nameOf(
           engine.askee
         )} did not have the ${engine.askedCard.toString()}`;
@@ -52,6 +63,15 @@ export class Action extends React.Component<Action.Props> {
       return `${client.nameOf(engine.asker)} asks ${client.nameOf(
         engine.askee
       )} for the ${engine.askedCard.toString()}`;
+    }
+
+    if (engine.phase === C.Phase.DECLARE) {
+      if (engine.ownSeat === engine.declarer) {
+        return `declaring ${fishSuitToString(engine.declaredSuit)}`;
+      }
+      return `${client.nameOf(engine.declarer)} is declaring ${fishSuitToString(
+        engine.declaredSuit
+      )}`;
     }
 
     return "";

@@ -44,17 +44,22 @@ export class Data {
   // hand size; always public
   handSize: Record<SeatID, number> = {} as any;
 
-  // asker asks askedCard from askee, last answer is lastResponse
-  // valid if phase is ASK / ANSWER / DECLARE, initially null
+  // asker asks askedCard from askee, initially null
   asker: SeatID | null = null;
   askee: SeatID | null = null;
   askedCard: Card | null = null;
-  lastResponse: boolean | null = null;
 
-  // declarer declares declaredSuit
-  // valid if phase is DECLARE
+  // declarer declares declaredSuit, initially null
   declarer: SeatID | null = null;
   declaredSuit: FishSuit | null = null;
+
+  // the last response
+  lastResponse:
+    | "good ask"
+    | "bad ask"
+    | "good declare"
+    | "bad declare"
+    | "null" = null;
 }
 
 // client/server agnostic cfish engine
@@ -267,7 +272,7 @@ export class Engine extends Data {
     }
 
     this.asker = response ? this.asker : this.askee;
-    this.lastResponse = response;
+    this.lastResponse = response ? "good ask" : "bad ask";
     this.phase = CFish.Phase.ASK;
   }
 
@@ -333,8 +338,7 @@ export class Engine extends Data {
       this.phase = CFish.Phase.ASK;
     }
 
-    this.declarer = null;
-    this.declaredSuit = null;
+    this.lastResponse = correct ? "good declare" : "bad declare";
   }
 
   // FINISH -> WAIT

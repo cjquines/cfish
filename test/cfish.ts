@@ -62,10 +62,12 @@ describe("Engine", () => {
     engine.ask(0, 1, C.C_3);
     (() => engine.answer(1, false)).should.throw;
     engine.answer(1, true);
+    engine.lastResponse.should.equal("good ask");
 
     engine.ask(0, 1, C.C_4);
     (() => engine.answer(1, true)).should.throw;
     engine.answer(1, false);
+    engine.lastResponse.should.equal("bad ask");
 
     (() => engine.ask(1, 0, C.C_2)).should.throw;
     engine.ask(1, 0, C.C_A);
@@ -92,6 +94,7 @@ describe("Engine", () => {
     owners[String(C.C_K)] = 5;
     engine.declare(3, owners);
 
+    engine.lastResponse.should.equal("good declare");
     engine.scoreOf(0).should.equal(0);
     engine.scoreOf(1).should.equal(1);
 
@@ -107,6 +110,7 @@ describe("Engine", () => {
     };
     trashDeclare(3, FishSuit.LOW_CLUBS, 1);
 
+    engine.lastResponse.should.equal("bad declare");
     engine.scoreOf(0).should.equal(1);
     engine.scoreOf(1).should.equal(1);
 
