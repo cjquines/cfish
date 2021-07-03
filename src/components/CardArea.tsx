@@ -32,9 +32,23 @@ export class CardArea extends React.Component<CardArea.Props> {
 
     return (
       <DragDropContext onDragEnd={(result) => this.onDragEnd(result)}>
+        {engine.ownHand.size ? (
+          <button
+            onClick={(e) => {
+              engine.ownHand.sort();
+              client.onUpdate(client);
+            }}
+          >
+            sort
+          </button>
+        ) : null}
         <Droppable direction="horizontal" droppableId="cardArea">
           {(provided, snapshot) => (
-            <div ref={provided.innerRef} {...provided.droppableProps} className="cardArea">
+            <div
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+              className="cardArea"
+            >
               {engine.ownHand?.cards.map((card, i) => (
                 <Draggable
                   key={card.toString()}
