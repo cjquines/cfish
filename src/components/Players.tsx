@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Card, genDeck } from "lib/cards";
+import { Card, FishSuit, fishSuitToString, genFishSuit } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
@@ -8,17 +8,29 @@ export namespace CardSelector {
   export type Props = {
     callback: (card: Card) => void;
     close: () => void;
+    disabled: Card[];
+    suits: FishSuit[];
   };
 }
 
 export class CardSelector extends React.Component<CardSelector.Props> {
   render() {
+    const { callback, close, disabled, suits } = this.props;
+
     return (
       <div className="cardSelector">
-        {[...genDeck()].map((card) => (
-          <button key={card.toString()} onClick={(e) => this.props.callback(card)}>
-            {card.toString()}
-          </button>
+        {suits.map((suit) => (
+          <div key={fishSuitToString(suit)}>
+            {[...genFishSuit(suit)].map((card) => (
+              <button
+                key={card.toString()}
+                onClick={(e) => callback(card)}
+                disabled={disabled.some((card_) => card_.equals(card))}
+              >
+                {card.toString()}
+              </button>
+            ))}
+          </div>
         ))}
         <button onClick={(e) => this.props.close()}>cancel</button>
       </div>
@@ -78,6 +90,10 @@ export class Players extends React.Component<Players.Props, Players.State> {
                     this.setState({ askee: null });
                   }}
                   close={() => this.setState({ askee: null })}
+                  disabled={engine.ownHand.cards}
+                  suits={Card.FISH_SUITS.filter((suit) =>
+                    engine.ownHand.hasSuit(suit)
+                  )}
                 />
               ) : null}
             </div>
