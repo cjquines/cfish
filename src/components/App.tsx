@@ -1,63 +1,29 @@
 import React from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import { Action } from "components/Action";
-import { PlayArea } from "components/PlayArea";
-import { Players } from "components/Players";
-import { Question } from "components/Question";
-import { CFish as C } from "lib/cfish";
-import { Client } from "lib/client";
+import Room from "components/Room";
+import Splash from "components/Splash";
 
 export namespace App {
   export type Props = {
     url: string;
   };
-
-  export type State = {
-    client: Client | null;
-    name: string;
-    room: string;
-  };
 }
 
-export class App extends React.Component<App.Props, App.State> {
-  constructor(props: App.Props) {
-    super(props);
-
-    this.state = {
-      client: null,
-      name: window.prompt("enter your name") || "no name",
-      room: "test",
-    };
-  }
-
-  componentDidMount() {
-    if (this.state.client !== null) return;
-    const client = new Client(this.props.url, this.state.room, this.state.name);
-    client.onUpdate = (client: Client) => this.setState({ client });
-    client.connect();
-    this.setState({ client });
-  }
-
+export class App extends React.Component<App.Props> {
   render() {
-    const { client } = this.state;
-    if (!client?.engine) {
-      return <div className="wrapper">loading...</div>;
-    }
-
-    const { engine } = client;
-
     return (
       <div className="wrapper">
-        <div className="game">
-          <div className="table">
-            <Players client={client} />
-            <Question client={client} />
-          </div>
-          <Action client={client} />
-          <div className="hand">
-            <PlayArea client={client} />
-          </div>
-        </div>
+        <Router>
+          <Switch>
+            <Route exact path="/">
+              <Splash />
+            </Route>
+            <Route path="/room/:room">
+              <Room url={this.props.url} />
+            </Route>
+          </Switch>
+        </Router>
       </div>
     );
   }
