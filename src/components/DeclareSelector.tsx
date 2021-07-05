@@ -5,7 +5,7 @@ import { CFish as C, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 import { UserID } from "lib/server";
 
-export namespace DeclareRow {
+namespace DeclareRow {
   export type Props = {
     callback: (card: string, seat: SeatID) => void;
     card: Card;
@@ -18,7 +18,7 @@ export namespace DeclareRow {
   };
 }
 
-export class DeclareRow extends React.Component<
+class DeclareRow extends React.Component<
   DeclareRow.Props,
   DeclareRow.State
 > {

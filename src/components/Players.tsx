@@ -2,7 +2,7 @@ import React from "react";
 
 import { CardSelector } from "components/CardSelector";
 import { Card } from "lib/cards";
-import { CFish as C } from "lib/cfish";
+import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 
 export namespace Players {
@@ -24,6 +24,56 @@ export class Players extends React.Component<Players.Props, Players.State> {
     };
   }
 
+  renderSeatBtn(seat: SeatID) {
+    const { client } = this.props;
+    const { engine } = client;
+
+    if (
+      (engine.ownSeat !== null && engine.ownSeat !== seat) ||
+      (engine.ownSeat === null && engine.userOf[seat] !== null)
+    )
+      return null;
+
+    return engine.ownSeat !== null ? (
+      <button onClick={(e) => client.unseatAt()}>stand up</button>
+    ) : (
+      <button onClick={(e) => client.seatAt(seat)}>sit down</button>
+    );
+  }
+
+  renderAskBtn(seat: SeatID) {
+    const { client } = this.props;
+    const { engine } = client;
+
+    return engine.phase === C.Phase.ASK &&
+      engine.asker === engine.ownSeat &&
+      engine.teamOf(seat) !== engine.teamOf(engine.ownSeat) ? (
+      <button onClick={(e) => this.setState({ askee: seat })}>ask</button>
+    ) : null;
+  }
+
+  renderCardSelector(seat: SeatID) {
+    const { client } = this.props;
+    const { engine } = client;
+
+    const callback = (card) => {
+      client.ask(seat, card);
+      this.setState({ askee: null });
+    };
+    const suits = Card.FISH_SUITS.filter((suit) =>
+      engine.ownHand.hasSuit(suit)
+    );
+
+    return this.state.askee === seat ? (
+      <CardSelector
+        callback={callback}
+        close={() => this.setState({ askee: null })}
+        disabled={engine.ownHand.cards}
+        suits={suits}
+      />
+    ) : null;
+  }
+
   render() {
     const { client } = this.props;
     const { engine, users } = client;
@@ -36,33 +86,9 @@ export class Players extends React.Component<Players.Props, Players.State> {
           <div className="player" key={seat}>
             <div className="playerInt">
               {`${client.nameOf(seat) ?? "empty"} (${engine.handSize[seat]})`}
-              {engine.ownSeat !== null ? (
-                engine.ownSeat === seat ? (
-                  <button onClick={(e) => client.unseatAt()}>stand up</button>
-                ) : null
-              ) : engine.userOf[seat] !== null ? null : (
-                <button onClick={(e) => client.seatAt(seat)}>sit down</button>
-              )}
-              {engine.phase === C.Phase.ASK &&
-              engine.asker === engine.ownSeat &&
-              engine.teamOf(seat) !== engine.teamOf(engine.ownSeat) ? (
-                <button onClick={(e) => this.setState({ askee: seat })}>
-                  ask
-                </button>
-              ) : null}
-              {this.state.askee === seat ? (
-                <CardSelector
-                  callback={(card) => {
-                    client.ask(seat, card);
-                    this.setState({ askee: null });
-                  }}
-                  close={() => this.setState({ askee: null })}
-                  disabled={engine.ownHand.cards}
-                  suits={Card.FISH_SUITS.filter((suit) =>
-                    engine.ownHand.hasSuit(suit)
-                  )}
-                />
-              ) : null}
+              {this.renderSeatBtn(seat)}
+              {this.renderAskBtn(seat)}
+              {this.renderCardSelector(seat)}
             </div>
           </div>
         ))}
