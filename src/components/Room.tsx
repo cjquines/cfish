@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import { RouteComponentProps } from "react-router";
 
 import { Action } from "components/Action";
-import { PlayArea } from "components/PlayArea";
+import { CardArea } from "components/CardArea";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { Client } from "lib/client";
@@ -58,9 +58,7 @@ class Room extends React.Component<Room.Props, Room.State> {
           <Question client={client} />
         </div>
         <Action client={client} />
-        <div className="hand">
-          <PlayArea client={client} />
-        </div>
+        <CardArea client={client} />
       </div>
     );
   }

@@ -75,19 +75,15 @@
   }
 }
 
-.hand {
-  min-height: 10rem;
+.cardArea {
+  display: flex;
 
-  .cardArea {
-    display: flex;
-
-    .card {
-      background-color: #ddd;
-      display: block;
-      height: 5rem;
-      margin: 0 0.5rem;
-      width: 3.5rem;
-    }
+  .card {
+    background-color: #ddd;
+    display: block;
+    height: 5rem;
+    margin: 0 0.5rem;
+    width: 3.5rem;
   }
 }
 

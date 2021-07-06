@@ -3,14 +3,28 @@ import React from "react";
 import { fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
+import { DeclareSelector } from "components/DeclareSelector";
+import { SuitSelector } from "components/SuitSelector";
 
 export namespace Action {
   export type Props = {
     client: Client;
   };
+
+  export type State = {
+    declaring: boolean;
+  };
 }
 
-export class Action extends React.Component<Action.Props> {
+export class Action extends React.Component<Action.Props, Action.State> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      declaring: false,
+    };
+  }
+
   renderText(): string {
     const { client } = this.props;
     const { engine } = client;
@@ -77,7 +91,7 @@ export class Action extends React.Component<Action.Props> {
     return "";
   }
 
-  renderButton(): JSX.Element | null {
+  renderTopButton(): JSX.Element | null {
     const { client } = this.props;
     const { engine } = client;
 
@@ -108,14 +122,83 @@ export class Action extends React.Component<Action.Props> {
     return null;
   }
 
+  renderSortButton(): JSX.Element | null {
+    const { client } = this.props;
+    const { engine } = client;
+
+    if (!engine.ownHand?.size) return null;
+
+    const onClick = (e) => {
+      engine.ownHand.sort();
+      client.onUpdate(client);
+    };
+
+    return <button onClick={onClick}>sort</button>;
+  }
+
+  renderDeclareButton(): JSX.Element | null {
+    const { client } = this.props;
+    const { engine } = client;
+
+    if (engine.phase !== C.Phase.ASK) return null;
+
+    const onClick = (e) => this.setState({ declaring: true });
+
+    return <button onClick={onClick}>declare</button>;
+  }
+
+  renderSuitSelector(): JSX.Element | null {
+    const { client } = this.props;
+    const { engine } = client;
+
+    if (!this.state.declaring) return null;
+
+    const close = () => this.setState({ declaring: false });
+    const callback = (suit) => {
+      client.initDeclare(suit);
+      this.setState({ declaring: false });
+    };
+
+    return <SuitSelector callback={callback} close={close} />;
+  }
+
+  renderDeclareSelector(): JSX.Element | null {
+    const { client } = this.props;
+    const { engine } = client;
+
+    if (engine.phase !== C.Phase.DECLARE || engine.ownSeat !== engine.declarer)
+      return null;
+
+    const users = client.users.filter(
+      (user) =>
+        engine.teamOf(engine.seatOf(user.id)) === engine.teamOf(engine.declarer)
+    );
+
+    return (
+      <DeclareSelector
+        callback={(owners) => client.declare(owners)}
+        seatOf={(user) => engine.seatOf(user)}
+        suit={engine.declaredSuit}
+        users={users}
+      />
+    );
+  }
+
   render() {
     const { client } = this.props;
     const { engine } = client;
 
     return (
       <div className="action">
-        <span>{this.renderText()}</span>
-        {this.renderButton()}
+        <div>
+          {this.renderText()} {this.renderTopButton()}
+        </div>
+        <div>
+          {this.renderSortButton()}
+          {this.renderDeclareButton()}
+          {this.renderSuitSelector()}
+          {this.renderDeclareSelector()}
+        </div>
       </div>
     );
   }
