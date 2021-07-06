@@ -121,9 +121,10 @@ export class Client {
         this.engine.removeUser(event.user);
         break;
       case "setRules":
-        this.engine.setRules(event.seat, event.rules);
+        this.engine.setRules(event.user, event.rules);
+        break;
       case "startGame":
-        this.engine.startGame(event.seat);
+        this.engine.startGame(event.user);
         break;
       case "startGameResponse":
         this.engine.startGameResponse(
@@ -181,7 +182,7 @@ export class Client {
   setRules(rules: C.Rules): void {
     return this.attempt({
       type: "setRules",
-      seat: this.engine.ownSeat,
+      user: this.engine.identity,
       rules: rules,
     });
   }
@@ -189,7 +190,7 @@ export class Client {
   startGame(shuffle: boolean = true): void {
     return this.attempt({
       type: "startGame",
-      seat: this.engine.ownSeat,
+      user: this.engine.identity,
       shuffle: shuffle,
     });
   }

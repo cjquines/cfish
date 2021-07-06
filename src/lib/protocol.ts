@@ -31,13 +31,13 @@ export namespace Protocol {
 
   export type SetRules = {
     type: "setRules";
-    seat: SeatID;
+    user: UserID;
     rules: C.Rules;
   }
 
   export type StartGame = {
     type: "startGame";
-    seat: SeatID;
+    user: UserID;
     shuffle?: boolean;
   };
 
@@ -45,7 +45,7 @@ export namespace Protocol {
     type: "startGameResponse";
     server: null;
     hand: Hand | null;
-    handSizes: Record<SeatID, number>;
+    handSizes: Record<SeatID, number> | null;
   };
 
   export type Ask = {
@@ -77,7 +77,7 @@ export namespace Protocol {
     type: "declareResponse";
     server: null;
     correct: boolean;
-    handSizes: Record<SeatID, number>;
+    handSizes: Record<SeatID, number> | null;
   };
 
   export type Event =

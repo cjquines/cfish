@@ -228,21 +228,21 @@ export class Engine extends Data {
   }
 
   // state machine actions
-  // first argument is always seat initiating
+  // first argument is always user/seat initiating
 
   // WAIT -> WAIT
-  setRules(seat: SeatID, rules: CFish.Rules): void {
+  setRules(user: UserID, rules: CFish.Rules): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
-    assert.strictEqual(this.userOf[seat], this.host);
+    assert.strictEqual(user, this.host);
 
     this.rules = { ...rules };
   }
 
   // WAIT -> ASK
   // server response: player hands
-  startGame(seat: SeatID, shuffle: boolean = true): void {
+  startGame(user: UserID, shuffle: boolean = true): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
-    assert.strictEqual(this.userOf[seat], this.host);
+    assert.strictEqual(user, this.host);
     assert.strictEqual(this.numSeated, this.rules.numPlayers);
 
     if (this.identity === null) {
@@ -268,12 +268,16 @@ export class Engine extends Data {
   startGameResponse(
     server: null,
     hand: Hand | null,
-    handSizes: Record<SeatID, number>
+    handSizes: Record<SeatID, number> | null
   ): void {
     if (this.ownSeat !== null && hand !== null) {
       this.handOf[this.ownSeat] = new Hand(hand);
     }
-    this.handSize = handSizes;
+    if (handSizes) {
+      this.handSize = handSizes;
+    } else if (this.ownSeat !== null) {
+      this.handSize[this.ownSeat] = this.ownHand.size;
+    }
   }
 
   // ASK -> ANSWER
@@ -284,7 +288,9 @@ export class Engine extends Data {
 
     if (this.handOf[asker] !== null) {
       assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
-      assert.isNotOk(this.handOf[asker].includes(card));
+      if (this.rules.bluff === CFish.BluffRule.NO) {
+        assert.isNotOk(this.handOf[asker].includes(card));
+      }
     }
 
     this.askee = askee;
@@ -321,6 +327,9 @@ export class Engine extends Data {
   initDeclare(declarer: SeatID, declaredSuit: FishSuit): void {
     assert.strictEqual(this.phase, CFish.Phase.ASK);
     assert.strictEqual(this.declarerOf[declaredSuit], undefined);
+    if (this.rules.declare === CFish.DeclareRule.DURING_TURN) {
+      assert.strictEqual(this.asker, declarer);
+    }
 
     this.declarer = declarer;
     this.declaredSuit = declaredSuit;
@@ -363,13 +372,18 @@ export class Engine extends Data {
   declareResponse(
     server: null,
     correct: boolean,
-    handSizes: Record<SeatID, number>
+    handSizes: Record<SeatID, number> | null
   ): void {
     const team = this.teamOf(this.declarer);
     const scorer = correct ? team : 1 - team;
 
     this.declarerOf[this.declaredSuit] = scorer as CFish.Team;
-    this.handSize = handSizes;
+
+    if (handSizes) {
+      this.handSize = handSizes;
+    } else if (this.ownSeat !== null) {
+      this.handSize[this.ownSeat] = this.ownHand.size;
+    }
 
     if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
       // they win, hooray? what else?

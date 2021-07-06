@@ -101,6 +101,8 @@ export class Room {
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
     const seat = this.engine.seatOf(user.id);
+    const publicHand = this.engine.rules.handSize === C.HandSizeRule.PUBLIC;
+
     this.event(event);
 
     switch (event.type) {
@@ -112,24 +114,24 @@ export class Room {
         this.engine.unseatAt(event.seat);
         return;
       case "setRules":
-        assert.strictEqual(seat, event.seat);
-        this.engine.setRules(event.seat, event.rules);
+        assert.strictEqual(user.id, event.user);
+        this.engine.setRules(event.user, event.rules);
         return;
       case "startGame":
-        assert.strictEqual(seat, event.seat);
-        this.engine.startGame(event.seat, event?.shuffle);
+        assert.strictEqual(user.id, event.user);
+        this.engine.startGame(event.user, event?.shuffle);
         this.event({
           type: "startGameResponse",
           server: null,
           hand: null,
-          handSizes: this.engine.handSize,
+          handSizes: publicHand ? this.engine.handSize : null,
         });
         for (const seat of this.engine.seats) {
           this.toSeat(seat, {
             type: "startGameResponse",
             server: null,
             hand: this.engine.handOf[seat],
-            handSizes: this.engine.handSize,
+            handSizes: publicHand ? this.engine.handSize : null,
           });
         }
         return;
@@ -153,7 +155,7 @@ export class Room {
           type: "declareResponse",
           server: null,
           correct: correct,
-          handSizes: this.engine.handSize,
+          handSizes: publicHand ? this.engine.handSize : null,
         });
         return;
     }
