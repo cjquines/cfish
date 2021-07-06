@@ -4,9 +4,47 @@ import {
   Draggable,
   Droppable,
   DropResult,
+  DraggableProvided,
 } from "react-beautiful-dnd";
 
+import { Card as Card_ } from "lib/cards";
 import { Client } from "lib/client";
+
+namespace Card {
+  export type Props = {
+    card: Card_;
+    index: number;
+  };
+}
+
+class Card extends React.Component<Card.Props> {
+  render() {
+    const { card, index } = this.props;
+
+    return (
+      <Draggable
+        key={card.toString()}
+        draggableId={card.toString()}
+        index={index}
+      >
+        {(provided, snapshot) => (
+          <div
+            className="card"
+            ref={provided.innerRef}
+            {...provided.draggableProps}
+            {...provided.dragHandleProps}
+            style={{
+              ...provided.draggableProps.style,
+              color: card.color(),
+            }}
+          >
+            {card.symbol()}
+          </div>
+        )}
+      </Draggable>
+    );
+  }
+}
 
 export namespace CardArea {
   export type Props = {
@@ -40,23 +78,7 @@ export class CardArea extends React.Component<CardArea.Props> {
               className="cardArea"
             >
               {engine.ownHand?.cards.map((card, i) => (
-                <Draggable
-                  key={card.toString()}
-                  draggableId={card.toString()}
-                  index={i}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                      style={provided.draggableProps.style}
-                      className="card"
-                    >
-                      {card.toString()}
-                    </div>
-                  )}
-                </Draggable>
+                <Card card={card} index={i} />
               ))}
               {provided.placeholder}
             </div>
