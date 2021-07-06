@@ -200,22 +200,22 @@ export class Server {
 
   reset(id: UserID): void {
     const { user, room } = this.userAndRoom(id);
-    this.rooms[room].reset(user);
+    this.rooms[room]?.reset(user);
   }
 
   event(id: UserID, event: P.Event): void {
     const { user, room } = this.userAndRoom(id);
-    this.rooms[room].update(user, event);
+    this.rooms[room]?.update(user, event);
   }
 
   rename(id: UserID, name: string): void {
     const { user, room } = this.userAndRoom(id);
-    this.rooms[room].rename(user, name);
+    this.rooms[room]?.rename(user, name);
   }
 
   leave(id: UserID): void {
     const { user, room } = this.userAndRoom(id);
-    this.rooms[room].leave(user);
+    this.rooms[room]?.leave(user);
   }
 
   close(room: RoomID): void {

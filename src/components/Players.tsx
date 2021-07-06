@@ -61,7 +61,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
       this.setState({ askee: null });
     };
     const suits = Card.FISH_SUITS.filter((suit) =>
-      engine.ownHand.hasSuit(suit)
+      engine.ownHand?.hasSuit(suit)
     );
 
     return this.state.askee === seat ? (
