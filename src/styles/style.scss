@@ -96,4 +96,27 @@
   position: relative;
   width: 18em;
   z-index: 2;
+
+  .row {
+    button {
+      background: transparent;
+      border: 1px solid black;
+      height: 2em;
+      margin: 0.1em;
+      width: 3em;
+
+      &:hover {
+        background: #0002;
+      }
+
+      &:disabled {
+        background: transparent;
+        color: gray !important;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+  }
 }

@@ -24,6 +24,11 @@ export function cardSuitToString(cardSuit: CardSuit): string {
   }
 }
 
+export function cardSuitToSymbol(cardSuit: CardSuit): string {
+  if (cardSuit === CardSuit.JOKER) return "★";
+  return cardSuitToString(cardSuit);
+}
+
 export enum FishSuit {
   LOW_CLUBS,
   HIGH_CLUBS,
@@ -95,6 +100,12 @@ export function rankToString(rank: Rank): string {
   }
 }
 
+export function rankToSymbol(rank: Rank): string {
+  if (rank === Rank.BLACK) return "B";
+  if (rank === Rank.RED) return "R";
+  return rankToString(rank);
+}
+
 export class Card {
   readonly fishSuit: FishSuit;
 
@@ -149,6 +160,29 @@ export class Card {
 
   toString(): string {
     return rankToString(this.rank) + cardSuitToString(this.cardSuit);
+  }
+
+  symbol(): string {
+    return rankToSymbol(this.rank) + cardSuitToSymbol(this.cardSuit);
+  }
+
+  color(): string {
+    switch (this.cardSuit) {
+      case CardSuit.CLUBS:
+        return "black";
+      case CardSuit.DIAMONDS:
+        return "red";
+      case CardSuit.SPADES:
+        return "black";
+      case CardSuit.HEARTS:
+        return "red";
+    }
+    switch (this.rank) {
+      case Rank.BLACK:
+        return "black";
+      case Rank.RED:
+        return "red";
+    }
   }
 
   compare(card: Card): number {

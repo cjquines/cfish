@@ -15,14 +15,16 @@ class CardSelectorRow extends React.Component<CardSelectorRow.Props> {
     const { callback, disabled, suit } = this.props;
 
     return (
-      <div key={fishSuitToString(suit)}>
+      <div className="row" key={fishSuitToString(suit)}>
         {[...genFishSuit(suit)].map((card) => (
           <button
+            disabled={disabled.some((card_) => card_.equals(card))}
             key={card.toString()}
             onClick={(e) => callback(card)}
-            disabled={disabled.some((card_) => card_.equals(card))}
+            style={{ color: card.color() }}
+            title={card.toString()}
           >
-            {card.toString()}
+            {card.symbol()}
           </button>
         ))}
       </div>
