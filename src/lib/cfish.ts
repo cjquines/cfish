@@ -19,10 +19,42 @@ export namespace CFish {
     FIRST = 0, // goes first
     SECOND,
   }
+
+  // can we ask for our own card?
+  export enum BluffRule {
+    NO,
+    YES,
+  }
+
+  // can we declare during any ask phase?
+  export enum DeclareRule {
+    DURING_ASK,
+    DURING_TURN,
+  }
+
+  // who knows hand sizes?
+  export enum HandSizeRule {
+    PUBLIC,
+    SECRET,
+  }
+
+  export type Rules = {
+    numPlayers: number;
+    bluff: BluffRule;
+    declare: DeclareRule;
+    handSize: HandSizeRule;
+  };
+
+  export const defaultRules: Rules = {
+    numPlayers: 6,
+    bluff: BluffRule.NO,
+    declare: DeclareRule.DURING_ASK,
+    handSize: HandSizeRule.PUBLIC,
+  };
 }
 
 export class Data {
-  numPlayers: number;
+  rules: CFish.Rules;
 
   phase: CFish.Phase = CFish.Phase.WAIT;
   // all users in the room
@@ -69,9 +101,10 @@ export class Data {
 // server sends action to server engine and clients
 
 export class Engine extends Data {
-  constructor(readonly numPlayers: number) {
+  constructor(rules: CFish.Rules = CFish.defaultRules) {
     super();
-    this.seats = _.range(numPlayers);
+    this.rules = { ...rules };
+    this.seats = _.range(this.rules.numPlayers);
     for (const seat of this.seats) {
       this.userOf[seat] = null;
       this.handOf[seat] = null;
@@ -126,7 +159,7 @@ export class Engine extends Data {
   // dupe and redact state
   redactFor(user: UserID): Data {
     const res = new Data();
-    res.numPlayers = this.numPlayers;
+    res.rules = { ...this.rules };
 
     res.phase = this.phase;
     res.users = this.users;
@@ -197,16 +230,24 @@ export class Engine extends Data {
   // state machine actions
   // first argument is always seat initiating
 
+  // WAIT -> WAIT
+  setRules(seat: SeatID, rules: CFish.Rules): void {
+    assert.strictEqual(this.phase, CFish.Phase.WAIT);
+    assert.strictEqual(this.userOf[seat], this.host);
+
+    this.rules = { ...rules };
+  }
+
   // WAIT -> ASK
   // server response: player hands
   startGame(seat: SeatID, shuffle: boolean = true): void {
     assert.strictEqual(this.phase, CFish.Phase.WAIT);
     assert.strictEqual(this.userOf[seat], this.host);
-    assert.strictEqual(this.numSeated, this.numPlayers);
+    assert.strictEqual(this.numSeated, this.rules.numPlayers);
 
     if (this.identity === null) {
       const deck = shuffle ? _.shuffle([...genDeck()]) : [...genDeck()];
-      const deal = _.unzip(_.chunk(deck, this.numPlayers));
+      const deal = _.unzip(_.chunk(deck, this.rules.numPlayers));
       for (const [seat, hand] of _.zip(this.seats, deal)) {
         this.handOf[seat] = new Hand(hand);
         this.handSize[seat] = this.handOf[seat].size;

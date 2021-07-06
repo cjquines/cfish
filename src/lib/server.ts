@@ -3,7 +3,7 @@ import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 
 import { Card } from "lib/cards";
-import { Engine, SeatID } from "lib/cfish";
+import { CFish as C, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 
 export type RoomID = string;
@@ -17,9 +17,9 @@ export class Room {
     readonly id: RoomID,
     readonly socket: IOServer,
     public closeCallback: () => void,
-    numPlayers: number
+    rules: C.Rules
   ) {
-    this.engine = new Engine(numPlayers);
+    this.engine = new Engine(rules);
   }
 
   // helpers
@@ -111,6 +111,10 @@ export class Room {
       case "unseatAt":
         this.engine.unseatAt(event.seat);
         return;
+      case "setRules":
+        assert.strictEqual(seat, event.seat);
+        this.engine.setRules(event.seat, event.rules);
+        return;
       case "startGame":
         assert.strictEqual(seat, event.seat);
         this.engine.startGame(event.seat, event?.shuffle);
@@ -190,7 +194,12 @@ export class Server {
   join(id: UserID, room: RoomID, name: string): void {
     const user: P.User = { id, name };
     if (this.rooms[room] === undefined) {
-      this.rooms[room] = new Room(room, this.socket, () => this.close(room), 6);
+      this.rooms[room] = new Room(
+        room,
+        this.socket,
+        () => this.close(room),
+        C.defaultRules
+      );
     }
     this.clients[id].join(room);
     this.rooms[room].join(user);

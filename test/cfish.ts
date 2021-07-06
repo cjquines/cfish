@@ -9,7 +9,7 @@ describe("Engine", () => {
   let engine;
 
   beforeEach(() => {
-    engine = new Engine(6);
+    engine = new Engine(CFish.defaultRules);
     ["a", "b", "c", "d", "e", "f"].forEach((user, seat) => {
       engine.addUser(user);
       engine.seatAt(user, seat);

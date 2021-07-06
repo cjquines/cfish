@@ -2,7 +2,7 @@ import { assert } from "chai";
 import { io, Socket } from "socket.io-client";
 
 import { Card, FishSuit, Hand } from "lib/cards";
-import { Data, Engine, SeatID } from "lib/cfish";
+import { CFish as C, Data, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 import { RoomID, UserID } from "lib/server";
 
@@ -73,7 +73,7 @@ export class Client {
   // get redacted state and initiate engine
   reset(data: Data): void {
     if (this.engine === null) {
-      this.engine = new Engine(data.numPlayers);
+      this.engine = new Engine(data.rules);
     }
 
     this.engine.phase = data.phase;
@@ -94,10 +94,8 @@ export class Client {
 
     this.engine.asker = data.asker;
     this.engine.askee = data.askee;
-    this.engine.askedCard = data.askedCard && new Card(
-      data.askedCard.cardSuit,
-      data.askedCard.rank
-    );
+    this.engine.askedCard =
+      data.askedCard && new Card(data.askedCard.cardSuit, data.askedCard.rank);
     this.engine.lastResponse = data.lastResponse;
 
     this.engine.declarer = data.declarer;
@@ -122,6 +120,8 @@ export class Client {
       case "removeUser":
         this.engine.removeUser(event.user);
         break;
+      case "setRules":
+        this.engine.setRules(event.seat, event.rules);
       case "startGame":
         this.engine.startGame(event.seat);
         break;
@@ -159,7 +159,6 @@ export class Client {
   // convenience actions
 
   // we don't need to apply it to our own engine; server will update us
-  // TODO do we want to predict?
   attempt(event: P.Event): void {
     this.socket.emit("event", event);
   }
@@ -176,6 +175,14 @@ export class Client {
     return this.attempt({
       type: "unseatAt",
       seat: this.engine.ownSeat,
+    });
+  }
+
+  setRules(rules: C.Rules): void {
+    return this.attempt({
+      type: "setRules",
+      seat: this.engine.ownSeat,
+      rules: rules,
     });
   }
 

@@ -1,5 +1,5 @@
 import { Card, FishSuit, Hand } from "lib/cards";
-import { SeatID } from "lib/cfish";
+import { CFish as C, SeatID } from "lib/cfish";
 import { UserID } from "lib/server";
 
 export namespace Protocol {
@@ -28,6 +28,12 @@ export namespace Protocol {
     type: "removeUser";
     user: UserID;
   };
+
+  export type SetRules = {
+    type: "setRules";
+    seat: SeatID;
+    rules: C.Rules;
+  }
 
   export type StartGame = {
     type: "startGame";
@@ -79,6 +85,7 @@ export namespace Protocol {
     | SeatAt
     | UnseatAt
     | RemoveUser
+    | SetRules
     | StartGame
     | StartGameResponse
     | Ask
