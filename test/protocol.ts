@@ -3,11 +3,12 @@ import "chai/register-should";
 import { createServer } from "http";
 
 import * as C from "./common";
+import { CFish } from "lib/cfish";
 import { Client } from "lib/client";
 import { Server } from "lib/server";
 
 describe("Client/Server", () => {
-  let clients = [],
+  let clients: Client[] = [],
     server,
     url;
 
@@ -45,6 +46,13 @@ describe("Client/Server", () => {
   });
 
   it("connects more clients", (done) => {
+    let count = 1;
+    clients[0].socket.on("join", () => {
+      if (count === 6) return;
+      count += 1;
+      if (count === 6) done();
+    });
+
     clients.push(new Client(url, "test", "b"));
     clients.push(new Client(url, "test", "c"));
     clients.push(new Client(url, "test", "d"));
@@ -53,12 +61,21 @@ describe("Client/Server", () => {
     for (let i = 1; i < 6; i++) {
       clients[i].connect();
     }
+  });
 
-    let count = 1;
-    clients[0].socket.on("join", () => {
-      if (count === 6) return;
-      count += 1;
-      if (count === 6) done();
+  it("changes rules", (done) => {
+    let run = false;
+    clients[1].socket.on("event", (event) => {
+      if (run) return;
+      run = true;
+      done();
+    });
+
+    clients[0].setRules({
+      numPlayers: 6,
+      bluff: CFish.BluffRule.YES,
+      declare: CFish.DeclareRule.DURING_TURN,
+      handSize: CFish.HandSizeRule.PUBLIC,
     });
   });
 
@@ -68,11 +85,7 @@ describe("Client/Server", () => {
       if (event.type !== "seatAt") return;
       count += 1;
       if (count !== 6) return;
-      clients[0].attempt({
-        type: "startGame",
-        seat: 0,
-        shuffle: false,
-      });
+      clients[0].startGame(false);
     });
 
     let count1 = 0;
@@ -100,7 +113,6 @@ describe("Client/Server", () => {
       done();
     });
 
-    clients[0].engine.handOf[0].cards[0].should.deep.equal(C.C_2);
     clients[0].attempt({
       type: "ask",
       asker: 0,
@@ -121,6 +133,24 @@ describe("Client/Server", () => {
       type: "answer",
       askee: 1,
       response: true,
+    });
+  });
+
+  it("enforces rules", (done) => {
+    let run = false;
+    clients[0].socket.on("event", (event) => {
+      if (run) return;
+      run = true;
+      done();
+    });
+
+    // allowing bluffs
+    clients[0].engine.handOf[0].cards[0].should.deep.equal(C.C_2);
+    clients[0].attempt({
+      type: "ask",
+      asker: 0,
+      askee: 1,
+      card: C.C_2,
     });
   });
 

@@ -38,22 +38,22 @@ describe("Engine", () => {
     engine.numSeated.should.equal(4);
     engine.host.should.equal("c");
     engine.seats.should.deep.equal([2, 3, 4, 5, 0, 1]);
-    (() => engine.startGame(0)).should.throw();
+    (() => engine.startGame("a")).should.throw();
 
     engine.addUser("a");
     engine.seatAt("a", 0);
     engine.addUser("b");
     engine.seatAt("b", 1);
 
-    (() => engine.startGame(0)).should.throw();
+    (() => engine.startGame("a")).should.throw();
 
-    engine.startGame(2);
+    engine.startGame("c");
 
-    (() => engine.startGame(2)).should.throw();
+    (() => engine.startGame("c")).should.throw();
   });
 
   it("runs a basic game", () => {
-    engine.startGame(0, false);
+    engine.startGame("a", false);
     engine.asker.should.equal(0);
 
     (() => engine.ask(1, 0, C.C_2)).should.throw;
@@ -129,8 +129,20 @@ describe("Engine", () => {
     engine.phase.should.equal(CFish.Phase.FINISH);
   });
 
-  it("runs a game with people added/removed", () => {
-    engine.startGame(0, false);
+  it("handles rules", () => {
+    engine.setRules("a", {
+      numPlayers: 6,
+      bluff: CFish.BluffRule.YES,
+      declare: CFish.DeclareRule.DURING_TURN,
+      handSize: CFish.HandSizeRule.PUBLIC,
+    });
+    engine.startGame("a", false);
+    engine.ask(0, 1, C.C_2);
+    engine.answer(1, false);
+    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+  });
+
+  it("runs with people added/removed", () => {
     engine.addUser("g");
     engine.unseatAt(5);
   });
