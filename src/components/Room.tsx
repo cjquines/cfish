@@ -3,9 +3,11 @@ import { withRouter } from "react-router-dom";
 import { RouteComponentProps } from "react-router";
 
 import { Action } from "components/Action";
+import { Config } from "components/Config";
 import { CardArea } from "components/CardArea";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
+import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
 export namespace Room {
@@ -58,7 +60,11 @@ class Room extends React.Component<Room.Props, Room.State> {
           <Question client={client} />
         </div>
         <Action client={client} />
-        <CardArea client={client} />
+        {engine.phase === C.Phase.WAIT ? (
+          <Config client={client} />
+        ) : (
+          <CardArea client={client} />
+        )}
       </div>
     );
   }

@@ -30,7 +30,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     const { engine } = client;
 
     if (engine.phase === C.Phase.WAIT) {
-      if (engine.numSeated < engine.numPlayers) {
+      if (engine.numSeated < engine.rules.numPlayers) {
         return "waiting for all players to be seated";
       }
       if (engine.identity === engine.host) {
@@ -98,7 +98,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     if (
       engine.phase === C.Phase.WAIT &&
       engine.identity === engine.host &&
-      engine.numSeated === engine.numPlayers
+      engine.numSeated === engine.rules.numPlayers
     ) {
       return <button onClick={(e) => client.startGame()}>start game</button>;
     }
