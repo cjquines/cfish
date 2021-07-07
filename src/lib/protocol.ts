@@ -45,7 +45,7 @@ export namespace Protocol {
     type: "startGameResponse";
     server: null;
     hand: Hand | null;
-    handSizes: Record<SeatID, number> | null;
+    handSizes: Record<SeatID, number | null>;
   };
 
   export type Ask = {

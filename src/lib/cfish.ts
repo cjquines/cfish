@@ -74,7 +74,7 @@ export class Data {
   // hands; maps to null for private hands
   handOf: Record<SeatID, Hand | null> = {} as any;
   // hand size; always public
-  handSize: Record<SeatID, number> = {} as any;
+  handSize: Record<SeatID, number | null> = {} as any;
 
   // asker asks askedCard from askee, initially null
   asker: SeatID | null = null;
@@ -124,6 +124,17 @@ export class Engine extends Data {
 
   get ownHand(): Hand | null {
     return this.handOf[this.ownSeat] ?? null;
+  }
+
+  get redactedHandSize(): Record<SeatID, number | null> {
+    if (this.rules.handSize === CFish.HandSizeRule.PUBLIC) {
+      return this.handSize;
+    }
+    const res = {};
+    for (const seat of this.seats) {
+      res[seat] = this.handSize[seat] === 0 ? 0 : null;
+    }
+    return res;
   }
 
   indexOf(seat: SeatID): number {

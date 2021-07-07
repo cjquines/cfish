@@ -101,7 +101,6 @@ export class Room {
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
     const seat = this.engine.seatOf(user.id);
-    const publicHand = this.engine.rules.handSize === C.HandSizeRule.PUBLIC;
 
     this.event(event);
 
@@ -124,14 +123,14 @@ export class Room {
           type: "startGameResponse",
           server: null,
           hand: null,
-          handSizes: publicHand ? this.engine.handSize : null,
+          handSizes: this.engine.redactedHandSize,
         });
         for (const seat of this.engine.seats) {
           this.toSeat(seat, {
             type: "startGameResponse",
             server: null,
             hand: this.engine.handOf[seat],
-            handSizes: publicHand ? this.engine.handSize : null,
+            handSizes: this.engine.redactedHandSize,
           });
         }
         return;
@@ -155,7 +154,7 @@ export class Room {
           type: "declareResponse",
           server: null,
           correct: correct,
-          handSizes: publicHand ? this.engine.handSize : null,
+          handSizes: this.engine.redactedHandSize,
         });
         return;
     }

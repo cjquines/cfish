@@ -85,7 +85,9 @@ export class Players extends React.Component<Players.Props, Players.State> {
         {engine.seats.map((seat) => (
           <div className="player" key={seat}>
             <div className="playerInt">
-              {`${client.nameOf(seat) ?? "empty"} (${engine.handSize[seat]})`}
+              {`${client.nameOf(seat) ?? "empty"} (${
+                engine.handSize[seat] === null ? "???" : engine.handSize[seat]
+              })`}
               {this.renderSeatBtn(seat)}
               {this.renderAskBtn(seat)}
               {this.renderCardSelector(seat)}
