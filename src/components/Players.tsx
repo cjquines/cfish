@@ -96,7 +96,6 @@ export class Players extends React.Component<Players.Props, Players.State> {
     // TODO rotate seats?
     return (
       <div className="players">
-        <p>users: {users.map((user) => user.name).join(", ")}</p>
         {engine.seats.map((seat) => (
           <div className="player" key={seat}>
             <div className="playerInt">

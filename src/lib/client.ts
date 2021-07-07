@@ -167,6 +167,10 @@ export class Client {
     this.socket.emit("event", event);
   }
 
+  attemptRename(name: string): void {
+    this.socket.emit("rename", name);
+  }
+
   seatAt(seat: SeatID): void {
     return this.attempt({
       type: "seatAt",

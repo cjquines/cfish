@@ -1,15 +1,68 @@
 @use "sass:math";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap");
+
+html {
+  font-family: "IBM Plex Sans", sans-serif;
+  line-height: 1.2;
+}
+
+body {
+  margin: 0;
+}
 
 .wrapper {
   display: flex;
   justify-content: center;
+  min-height: 100vh;
+}
+
+.room {
+  display: grid;
+  grid-template: 1fr 1fr / 15rem 1fr;
 }
 
 .game {
   align-items: center;
   display: flex;
   flex-direction: column;
+  grid-column: 2 / 3;
+  grid-row: 1 / 3;
   width: fit-content;
+}
+
+.toggles {
+  display: none;
+}
+
+@media screen and (max-width: 700px) {
+  .room {
+    display: flex;
+  }
+
+  .toggles {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &.active {
+      left: 90vw;
+    }
+  }
+
+  .users,
+  .log {
+    background: #fff;
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 90vw;
+
+    &.active {
+      display: block;
+    }
+  }
 }
 
 .table {
