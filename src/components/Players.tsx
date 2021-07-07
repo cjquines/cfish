@@ -60,6 +60,8 @@ export class Players extends React.Component<Players.Props, Players.State> {
       client.ask(seat, card);
       this.setState({ askee: null });
     };
+    const disabled =
+      engine.rules.bluff === C.BluffRule.YES ? [] : engine.ownHand.cards;
     const suits = Card.FISH_SUITS.filter((suit) =>
       engine.ownHand?.hasSuit(suit)
     );
@@ -68,7 +70,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
       <CardSelector
         callback={callback}
         close={() => this.setState({ askee: null })}
-        disabled={engine.ownHand.cards}
+        disabled={disabled}
         suits={suits}
       />
     ) : null;

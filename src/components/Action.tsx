@@ -141,6 +141,11 @@ export class Action extends React.Component<Action.Props, Action.State> {
     const { engine } = client;
 
     if (engine.phase !== C.Phase.ASK) return null;
+    if (
+      engine.rules.declare === C.DeclareRule.DURING_TURN &&
+      engine.ownSeat !== engine.asker
+    )
+      return null;
 
     const onClick = (e) => this.setState({ declaring: true });
 
