@@ -30,7 +30,6 @@ export class Config extends React.Component<Config.Props> {
     return (
       <button
         disabled={selected}
-        key={String(val)}
         onClick={onClick}
         title={title}
       >

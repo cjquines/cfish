@@ -24,6 +24,19 @@ export class Players extends React.Component<Players.Props, Players.State> {
     };
   }
 
+  renderName(seat: SeatID) {
+    const { client } = this.props;
+    const { engine } = client;
+
+    const res = [];
+    res.push(`${client.nameOf(seat) ?? "empty"}`);
+    if (engine.handSize[seat] !== null) {
+      res.push(`(${engine.handSize[seat]})`);
+    }
+
+    return res.join(" ");
+  }
+
   renderSeatBtn(seat: SeatID) {
     const { client } = this.props;
     const { engine } = client;
@@ -61,7 +74,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
       this.setState({ askee: null });
     };
     const disabled =
-      engine.rules.bluff === C.BluffRule.YES ? [] : engine.ownHand.cards;
+      engine.rules.bluff === C.BluffRule.YES ? [] : engine.ownHand?.cards;
     const suits = Card.FISH_SUITS.filter((suit) =>
       engine.ownHand?.hasSuit(suit)
     );
@@ -87,9 +100,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
         {engine.seats.map((seat) => (
           <div className="player" key={seat}>
             <div className="playerInt">
-              {`${client.nameOf(seat) ?? "empty"} (${
-                engine.handSize[seat] === null ? "???" : engine.handSize[seat]
-              })`}
+              {this.renderName(seat)}
               {this.renderSeatBtn(seat)}
               {this.renderAskBtn(seat)}
               {this.renderCardSelector(seat)}

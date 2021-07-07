@@ -279,14 +279,13 @@ export class Engine extends Data {
   startGameResponse(
     server: null,
     hand: Hand | null,
-    handSizes: Record<SeatID, number> | null
+    handSizes: Record<SeatID, number>
   ): void {
     if (this.ownSeat !== null && hand !== null) {
       this.handOf[this.ownSeat] = new Hand(hand);
     }
-    if (handSizes) {
-      this.handSize = handSizes;
-    } else if (this.ownSeat !== null) {
+    this.handSize = handSizes;
+    if (this.ownHand !== null) {
       this.handSize[this.ownSeat] = this.ownHand.size;
     }
   }
@@ -325,8 +324,12 @@ export class Engine extends Data {
       if (this.handOf[this.askee] !== null) {
         this.handOf[this.askee].remove(this.askedCard);
       }
-      this.handSize[this.asker] += 1;
-      this.handSize[this.askee] -= 1;
+      if (this.handSize[this.asker] !== null) {
+        this.handSize[this.asker] += 1;
+      }
+      if (this.handSize[this.askee] !== null) {
+        this.handSize[this.askee] -= 1;
+      }
     }
 
     this.asker = response ? this.asker : this.askee;
@@ -383,16 +386,15 @@ export class Engine extends Data {
   declareResponse(
     server: null,
     correct: boolean,
-    handSizes: Record<SeatID, number> | null
+    handSizes: Record<SeatID, number>
   ): void {
     const team = this.teamOf(this.declarer);
     const scorer = correct ? team : 1 - team;
 
     this.declarerOf[this.declaredSuit] = scorer as CFish.Team;
 
-    if (handSizes) {
-      this.handSize = handSizes;
-    } else if (this.ownSeat !== null) {
+    this.handSize = handSizes;
+    if (this.ownHand !== null) {
       this.handSize[this.ownSeat] = this.ownHand.size;
     }
 

@@ -91,6 +91,9 @@ export class Client {
         : null;
     }
     this.engine.handSize = data.handSize;
+    if (this.engine.ownSeat && this.engine.ownHand) {
+      this.engine.handSize[this.engine.ownSeat] = this.engine.ownHand.size;
+    }
 
     this.engine.asker = data.asker;
     this.engine.askee = data.askee;

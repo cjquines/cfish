@@ -60,11 +60,10 @@ class Room extends React.Component<Room.Props, Room.State> {
           <Question client={client} />
         </div>
         <Action client={client} />
-        {engine.phase === C.Phase.WAIT ? (
+        {engine.phase === C.Phase.WAIT && engine.identity === engine.host ? (
           <Config client={client} />
-        ) : (
-          <CardArea client={client} />
-        )}
+        ) : null}
+        {engine.ownHand !== null ? <CardArea client={client} /> : null}
       </div>
     );
   }
