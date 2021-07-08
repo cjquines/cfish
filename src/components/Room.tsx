@@ -5,6 +5,7 @@ import { RouteComponentProps } from "react-router";
 import { Action } from "components/Action";
 import { Config } from "components/Config";
 import { CardArea } from "components/CardArea";
+import { Log } from "components/Log";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { Users } from "components/Users";
@@ -84,7 +85,7 @@ class Room extends React.Component<Room.Props, Room.State> {
           {engine.ownHand !== null ? <CardArea client={client} /> : null}
         </div>
         <Users active={this.state.sidebar === "users"} client={client} />
-        <Users active={this.state.sidebar === "log"} client={client} />
+        <Log active={this.state.sidebar === "log"} client={client} />
         <div
           className={`toggles ${
             this.state.sidebar === "closed" ? "" : "active"

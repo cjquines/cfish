@@ -1,7 +1,7 @@
 import { assert } from "chai";
 import { io, Socket } from "socket.io-client";
 
-import { Card, FishSuit, Hand } from "lib/cards";
+import { Card, FishSuit, fishSuitToString, Hand } from "lib/cards";
 import { CFish as C, Data, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 import { RoomID, UserID } from "lib/server";
@@ -9,6 +9,7 @@ import { RoomID, UserID } from "lib/server";
 export class Client {
   engine: Engine | null = null;
   identity: P.User | null = null;
+  log: string[] = [];
   socket: Socket;
   status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
@@ -27,6 +28,8 @@ export class Client {
     this.socket.on("leave", (user) => this.leave(user));
   }
 
+  // getters
+
   findUser(id: UserID | SeatID): P.User | null {
     const res =
       typeof id === "string" // true iff UserID
@@ -35,10 +38,26 @@ export class Client {
     return res.length === 1 ? res[0] : null;
   }
 
-  nameOf(id: UserID | SeatID): string | null {
+  nameOf(id: UserID | SeatID): string {
     const user = this.findUser(id);
-    return user ? user.name : null;
+    return user ? user.name : "an empty seat";
   }
+
+  stringify(
+    key: "asker" | "askee" | "askedCard" | "declarer" | "declaredSuit"
+  ): string {
+    const obj = this.engine[key];
+    if (key === "declaredSuit") {
+      return fishSuitToString(this.engine[key]);
+    } else if (typeof obj === "number") {
+      const user = this.findUser(obj);
+      return user?.id === this.identity?.id ? "you" : this.nameOf(obj);
+    } else {
+      return obj.toString();
+    }
+  }
+
+  // protocol actions
 
   connect(): void {
     this.socket.on("connect", () => {
@@ -110,6 +129,8 @@ export class Client {
   // process event from server
   update(event: P.Event): void {
     if (this.engine === null) return;
+    const sfy = (key) => this.stringify(key);
+
     switch (event.type) {
       case "addUser":
         this.engine.addUser(event.user);
@@ -128,6 +149,7 @@ export class Client {
         break;
       case "startGame":
         this.engine.startGame(event.user);
+        this.log.push(`${this.nameOf(event.user)} started the game`);
         break;
       case "startGameResponse":
         this.engine.startGameResponse(
@@ -139,12 +161,23 @@ export class Client {
       case "ask":
         const card = new Card(event.card.cardSuit, event.card.rank);
         this.engine.ask(event.asker, event.askee, card);
+        this.log.push(
+          `${sfy("asker")} asked ${sfy("askee")} for the ${sfy("askedCard")}`
+        );
         break;
       case "answer":
         this.engine.answer(event.askee, event.response);
+        this.log.push(
+          event.response
+            ? `${sfy("askee")} gave ${sfy("asker")} the ${sfy("askedCard")}`
+            : `${sfy("askee")} did not have the ${sfy("askedCard")}`
+        );
         break;
       case "initDeclare":
         this.engine.initDeclare(event.declarer, event.declaredSuit);
+        this.log.push(
+          `${sfy("declarer")} began declaring ${sfy("declaredSuit")}`
+        );
         break;
       case "declare":
         this.engine.declare(event.declarer, event.owners);
@@ -154,6 +187,11 @@ export class Client {
           event.server,
           event.correct,
           event.handSizes
+        );
+        this.log.push(
+          event.correct
+            ? `${sfy("declarer")} correctly declared ${sfy("declaredSuit")}`
+            : `${sfy("declarer")} incorrectly declared ${sfy("declaredSuit")}`
         );
         break;
     }
