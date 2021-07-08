@@ -38,11 +38,18 @@ export namespace CFish {
     SECRET,
   }
 
+  // what should be shown in the log?
+  export enum LogRule {
+    LAST_ACTION,
+    EVERYTHING,
+  }
+
   export type Rules = {
     numPlayers: number;
     bluff: BluffRule;
     declare: DeclareRule;
     handSize: HandSizeRule;
+    log: LogRule;
   };
 
   export const defaultRules: Rules = {
@@ -50,6 +57,7 @@ export namespace CFish {
     bluff: BluffRule.NO,
     declare: DeclareRule.DURING_ASK,
     handSize: HandSizeRule.PUBLIC,
+    log: LogRule.LAST_ACTION,
   };
 }
 

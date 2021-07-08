@@ -72,10 +72,9 @@ describe("Client/Server", () => {
     });
 
     clients[0].setRules({
-      numPlayers: 6,
+      ...clients[0].engine.rules,
       bluff: CFish.BluffRule.YES,
       declare: CFish.DeclareRule.DURING_TURN,
-      handSize: CFish.HandSizeRule.PUBLIC,
     });
   });
 

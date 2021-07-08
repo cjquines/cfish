@@ -28,11 +28,7 @@ export class Config extends React.Component<Config.Props> {
     };
 
     return (
-      <button
-        disabled={selected}
-        onClick={onClick}
-        title={title}
-      >
+      <button disabled={selected} onClick={onClick} title={title}>
         {label}
       </button>
     );
@@ -79,6 +75,18 @@ export class Config extends React.Component<Config.Props> {
           "handSize",
           CFish.HandSizeRule.SECRET,
           "people only know whether or not someone has cards"
+        )}
+        {this.renderOption(
+          "log last action",
+          "log",
+          CFish.LogRule.LAST_ACTION,
+          "everyone can see the last action"
+        )}
+        {this.renderOption(
+          "log all actions",
+          "log",
+          CFish.LogRule.EVERYTHING,
+          "everyone can see the history of every action"
         )}
       </div>
     );
