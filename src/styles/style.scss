@@ -139,11 +139,11 @@ $rot: 90;
 
 .question {
   height: 70%;
-  left: 25%;
+  left: 20%;
   padding: 0;
   position: absolute;
   top: 15%;
-  width: 50%;
+  width: 60%;
 
   > div,
   > div > div {
@@ -254,16 +254,27 @@ $rot: 90;
 }
 
 .cardSelector {
-  background-color: var(--gray-0);
-  width: 18em;
+  align-items: center;
+  background-color: var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 18rem;
+  padding: 0.5rem 0.25rem;
 
   .row {
     button {
-      font-size: 0.9rem;
+      background: var(--gray-0);
+      font-size: 0.85rem;
       height: 2em;
-      margin: 0.1em;
+      padding: 0.2em 0.5em 0.1em;
+      margin: 0.2em;
       min-width: 0;
-      width: 3em;
+      width: 3.1em;
+
+      &:hover {
+        background: var(--gray-200);
+      }
 
       .cardSpan {
         width: 100%;
@@ -273,13 +284,22 @@ $rot: 90;
         background: transparent;
 
         .cardSpan {
-          color: #bbb !important;
+          color: var(--gray-400) !important;
         }
 
         &:hover {
           background: transparent;
         }
       }
+    }
+  }
+
+  > button {
+    background: var(--gray-100);
+    margin: 0.5rem 0 0.25rem;
+
+    &:hover {
+      background: var(--gray-200);
     }
   }
 }
