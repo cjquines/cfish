@@ -140,17 +140,16 @@ export class Action extends React.Component<Action.Props, Action.State> {
     if (engine.phase !== C.Phase.DECLARE || engine.ownSeat !== engine.declarer)
       return null;
 
-    const users = client.users.filter(
-      (user) =>
-        engine.teamOf(engine.seatOf(user.id)) === engine.teamOf(engine.declarer)
+    const seats = engine.seats.filter(
+      (seat) => engine.teamOf(seat) === engine.teamOf(engine.declarer)
     );
 
     return (
       <DeclareSelector
         callback={(owners) => client.declare(owners)}
-        seatOf={(user) => engine.seatOf(user)}
+        client={client}
         suit={engine.declaredSuit}
-        users={users}
+        seats={seats}
       />
     );
   }

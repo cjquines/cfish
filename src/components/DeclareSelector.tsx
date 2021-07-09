@@ -2,15 +2,15 @@ import React from "react";
 
 import { Card, FishSuit, fishSuitToString, genFishSuit } from "lib/cards";
 import { CFish as C, SeatID } from "lib/cfish";
+import { Client } from "lib/client";
 import { Protocol as P } from "lib/protocol";
-import { UserID } from "lib/server";
 
 namespace DeclareRow {
   export type Props = {
     callback: (card: string, seat: SeatID) => void;
+    client: Client;
     card: Card;
-    seatOf: (user: UserID) => SeatID | null;
-    users: P.User[];
+    seats: SeatID[];
   };
 
   export type State = {
@@ -18,10 +18,7 @@ namespace DeclareRow {
   };
 }
 
-class DeclareRow extends React.Component<
-  DeclareRow.Props,
-  DeclareRow.State
-> {
+class DeclareRow extends React.Component<DeclareRow.Props, DeclareRow.State> {
   constructor(props) {
     super(props);
 
@@ -39,26 +36,23 @@ class DeclareRow extends React.Component<
   }
 
   render() {
-    const { card, users, seatOf } = this.props;
+    const { card, client, seats } = this.props;
 
     return (
       <div>
         <span>{card.toString()}</span>
-        {users.map((user) => {
-          const seat = seatOf(user.id);
-          return (
-            <span key={user.id}>
-              <input
-                checked={this.state.owner === seat}
-                name={card.toString()}
-                onChange={(e) => this.onChange(e)}
-                type="radio"
-                value={seat.toString()}
-              />
-              <label htmlFor={seat.toString()}>{user.name}</label>
-            </span>
-          );
-        })}
+        {seats.map((seat) => (
+          <span key={seat}>
+            <input
+              checked={this.state.owner === seat}
+              name={card.toString()}
+              onChange={(e) => this.onChange(e)}
+              type="radio"
+              value={seat.toString()}
+            />
+            <label htmlFor={seat.toString()}>{client.nameOf(seat)}</label>
+          </span>
+        ))}
       </div>
     );
   }
@@ -67,9 +61,9 @@ class DeclareRow extends React.Component<
 export namespace DeclareSelector {
   export type Props = {
     callback: (owners: Record<string, SeatID>) => void;
-    seatOf: (user: UserID) => SeatID | null;
+    client: Client;
+    seats: SeatID[];
     suit: FishSuit;
-    users: P.User[];
   };
 
   export type State = {
@@ -106,7 +100,7 @@ export class DeclareSelector extends React.Component<
   }
 
   render() {
-    const { callback, seatOf, suit, users } = this.props;
+    const { callback, client, seats, suit } = this.props;
 
     return (
       <form onSubmit={(e) => this.onSubmit(e)}>
@@ -115,8 +109,8 @@ export class DeclareSelector extends React.Component<
             key={card.toString()}
             callback={(card, seat) => this.rowCallback(card, seat)}
             card={card}
-            seatOf={(user) => seatOf(user)}
-            users={users}
+            client={client}
+            seats={seats}
           />
         ))}
         <button type="submit">submit</button>
