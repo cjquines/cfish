@@ -10,6 +10,36 @@ import {
 import { Card as Card_ } from "lib/cards";
 import { Client } from "lib/client";
 
+export namespace CardSpan {
+  export type Props = {
+    break?: boolean;
+    card: Card_;
+  };
+}
+
+export class CardSpan extends React.Component<CardSpan.Props> {
+  render() {
+    const { card } = this.props;
+    const color = card.color();
+    const symbol = card.symbol();
+    // jank, fix this
+    const suit = symbol.slice(-1);
+    const rank = this.props.break && suit === "★" ? "" : symbol.slice(0, -1);
+
+    return (
+      <span className="cardSpan" style={{ color }}>
+        {rank ? (
+          <>
+            <span className="rank">{rank}</span>
+            {this.props.break ? <br /> : null}
+          </>
+        ) : null}
+        <span className="suit">{suit}</span>
+      </span>
+    );
+  }
+}
+
 namespace Card {
   export type Props = {
     card: Card_;
@@ -29,16 +59,15 @@ class Card extends React.Component<Card.Props> {
       >
         {(provided, snapshot) => (
           <div
-            className="card"
+            className="cardFrame"
             ref={provided.innerRef}
             {...provided.draggableProps}
             {...provided.dragHandleProps}
-            style={{
-              ...provided.draggableProps.style,
-              color: card.color(),
-            }}
+            {...provided.draggableProps.style}
           >
-            {card.symbol()}
+            <div className="card">
+              <CardSpan break={true} card={card} />
+            </div>
           </div>
         )}
       </Draggable>

@@ -1,5 +1,6 @@
 import React from "react";
 
+import { CardSpan } from "components/CardArea";
 import { Card, FishSuit, fishSuitToString, genFishSuit } from "lib/cards";
 
 namespace CardSelectorRow {
@@ -21,10 +22,9 @@ class CardSelectorRow extends React.Component<CardSelectorRow.Props> {
             disabled={disabled.some((card_) => card_.equals(card))}
             key={card.toString()}
             onClick={(e) => callback(card)}
-            style={{ color: card.color() }}
             title={card.toString()}
           >
-            {card.symbol()}
+            <CardSpan card={card} />
           </button>
         ))}
       </div>

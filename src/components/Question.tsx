@@ -7,6 +7,7 @@ import {
   ValidLineStyles,
 } from "react-archer";
 
+import { CardSpan } from "components/CardArea";
 import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 
@@ -56,7 +57,11 @@ export class Question extends React.Component<Question.Props> {
               targetId: String(engine.askee),
               targetAnchor: "top" as AnchorPosition,
               sourceAnchor: "top" as AnchorPosition,
-              label: <div className="label">{engine.askedCard.toString()}</div>,
+              label: (
+                <div className="label">
+                  <CardSpan card={engine.askedCard} />
+                </div>
+              ),
               style: {
                 lineStyle: "straight" as ValidLineStyles,
               },
