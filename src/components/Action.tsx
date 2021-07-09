@@ -1,9 +1,37 @@
-import React from "react";
+import React, { useState } from "react";
+import { usePopper } from "react-popper";
 
 import { Card, fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 import { SuitSelector } from "components/SuitSelector";
+
+const ActionInt = (props: {
+  declareBtn: JSX.Element | null;
+  sortBtn: JSX.Element | null;
+  suitSelector: (update: () => void) => JSX.Element | null;
+}) => {
+  const [outRef, setOutRef] = useState<HTMLElement>(null);
+  const [inRef, setInRef] = useState<HTMLElement>(null);
+  const { styles, attributes, update } = usePopper(outRef, inRef, {
+    placement: "bottom",
+  });
+
+  return (
+    <div className="actionInt" ref={setOutRef}>
+      {props.sortBtn}
+      {props.declareBtn}
+      <div
+        className="popWrap"
+        ref={setInRef}
+        style={styles.popper}
+        {...attributes.popper}
+      >
+        {props.suitSelector(update)}
+      </div>
+    </div>
+  );
+};
 
 export namespace Action {
   export type Props = {
@@ -113,12 +141,16 @@ export class Action extends React.Component<Action.Props, Action.State> {
     )
       return null;
 
-    const onClick = (e) => this.setState({ declaring: true });
+    const isDeclare = this.state.declaring === false;
+    const text = isDeclare ? "declare" : "cancel";
+    const declaring = isDeclare ? true : false;
 
-    return <button onClick={onClick}>declare</button>;
+    return (
+      <button onClick={(e) => this.setState({ declaring })}>{text}</button>
+    );
   }
 
-  renderSuitSelector(): JSX.Element | null {
+  renderSuitSelector(update: () => void): JSX.Element | null {
     const { client } = this.props;
     const { engine } = client;
 
@@ -134,7 +166,12 @@ export class Action extends React.Component<Action.Props, Action.State> {
     );
 
     return (
-      <SuitSelector callback={callback} close={close} disabled={disabled} />
+      <SuitSelector
+        callback={callback}
+        close={close}
+        disabled={disabled}
+        update={update}
+      />
     );
   }
 
@@ -147,11 +184,11 @@ export class Action extends React.Component<Action.Props, Action.State> {
         <div>
           {this.renderText()} {this.renderTopButton()}
         </div>
-        <div>
-          {this.renderSortButton()}
-          {this.renderDeclareButton()}
-          {this.renderSuitSelector()}
-        </div>
+        <ActionInt
+          declareBtn={this.renderDeclareButton()}
+          sortBtn={this.renderSortButton()}
+          suitSelector={(update) => this.renderSuitSelector(update)}
+        />
       </div>
     );
   }

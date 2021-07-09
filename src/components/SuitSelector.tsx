@@ -18,8 +18,7 @@ export class SuitSpan extends React.Component<SuitSpan.Props> {
 
     return (
       <span className="suitSpan" style={{ color }}>
-        <span>{string}</span>
-        <span className="suit">{suitChar}</span>
+        <span>{string}</span> <span className="suit">{suitChar}</span>
       </span>
     );
   }
@@ -30,10 +29,15 @@ export namespace SuitSelector {
     callback: (suit: FishSuit) => void;
     close: () => void;
     disabled: FishSuit[];
+    update: () => void;
   };
 }
 
 export class SuitSelector extends React.Component<SuitSelector.Props> {
+  componentDidMount() {
+    this.props.update();
+  }
+
   render() {
     const { callback, close, disabled } = this.props;
 
@@ -48,7 +52,7 @@ export class SuitSelector extends React.Component<SuitSelector.Props> {
             <SuitSpan suit={suit} />
           </button>
         ))}
-        <button onClick={(e) => close()}>close</button>
+        {/*<button onClick={(e) => close()}>close</button>*/}
       </div>
     );
   }

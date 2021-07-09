@@ -89,14 +89,15 @@ export class Players extends React.Component<Players.Props, Players.State> {
     const { engine } = client;
 
     if (
-      engine.phase === C.Phase.ASK &&
-      engine.asker === engine.ownSeat &&
-      engine.teamOf(seat) !== engine.teamOf(engine.ownSeat)
+      engine.phase !== C.Phase.ASK ||
+      engine.asker !== engine.ownSeat ||
+      engine.teamOf(seat) === engine.teamOf(engine.ownSeat)
     )
       return null;
 
-    const text = this.state.askee === null ? "ask" : "cancel";
-    const askee = this.state.askee === null ? seat : null;
+    const isAsk = this.state.askee !== seat;
+    const text = isAsk ? "ask" : "cancel";
+    const askee = isAsk ? seat : null;
 
     return <button onClick={(e) => this.setState({ askee })}>{text}</button>;
   }

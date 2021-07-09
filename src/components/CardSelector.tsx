@@ -59,7 +59,7 @@ export class CardSelector extends React.Component<CardSelector.Props> {
             suit={suit}
           />
         ))}
-        <button onClick={(e) => this.props.close()}>cancel</button>
+        {/*<button onClick={(e) => this.props.close()}>cancel</button>*/}
       </div>
     );
   }

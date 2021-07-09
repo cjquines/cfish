@@ -1,5 +1,6 @@
 import React from "react";
 
+import { SuitSpan } from "components/SuitSelector";
 import { Card, fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
@@ -41,7 +42,9 @@ export class Info extends React.Component<Info.Props> {
           {Card.FISH_SUITS.filter(
             (suit) => engine.declarerOf[suit] === team
           ).map((suit, i) => (
-            <li key={i}>{fishSuitToString(suit)}</li>
+            <li key={i}>
+              <SuitSpan suit={suit} />
+            </li>
           ))}
         </ul>
       </div>

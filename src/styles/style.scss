@@ -36,6 +36,15 @@ button {
   &:hover {
     background: var(--gray-300);
   }
+
+  &:disabled {
+    background: var(--gray-200);
+    color: var(--gray-500);
+
+    &:hover {
+      background: var(--gray-200);
+    }
+  }
 }
 
 $rot: 90;
@@ -76,7 +85,7 @@ $rot: 90;
 .info {
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-evenly;
 
   p {
     margin: 0.5rem 0;
@@ -197,7 +206,7 @@ $rot: 90;
 
     &:disabled {
       background: var(--gray-200);
-      color: var(--gray-500)
+      color: var(--gray-500);
     }
 
     &:hover {
@@ -288,11 +297,15 @@ $rot: 90;
   > div {
     min-height: 1.5em;
   }
+
+  button {
+    margin: 0 0.25rem;
+  }
 }
 
 .cardArea {
   display: flex;
-  left: -1.5rem;
+  left: -1rem;
   position: relative;
 }
 
@@ -357,7 +370,7 @@ $rot: 90;
   flex-direction: column;
   justify-content: center;
   width: 18rem;
-  padding: 0.5rem 0.25rem;
+  padding: 0.25rem;
 
   .row {
     button {
@@ -390,26 +403,48 @@ $rot: 90;
       }
     }
   }
+}
 
-  > button {
-    background: var(--gray-100);
-    margin: 0.5rem 0 0.25rem;
+.suitSelector {
+  background-color: var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  height: 4rem;
+  padding: 0.25rem;
+  position: relative;
+  top: 0.5rem;
+  width: 24rem;
+  z-index: 2;
+
+  .suitSpan {
+    width: unset;
+  }
+
+  button {
+    background: var(--gray-0);
+    margin: 0.25rem;
 
     &:hover {
       background: var(--gray-200);
     }
+
+    &:disabled {
+      background: transparent;
+
+      .suitSpan {
+        color: var(--gray-400) !important;
+      }
+
+      &:hover {
+        background: transparent;
+      }
+    }
   }
 }
 
-.suitSelector {
-  background: #fff;
-  height: 6rem;
-  position: relative;
-  width: 18em;
-  z-index: 2;
-}
-
-.cardSpan, .suitSpan {
+.cardSpan,
+.suitSpan {
   display: block;
   text-align: center;
   width: fit-content;
