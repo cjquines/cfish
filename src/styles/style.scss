@@ -1,30 +1,50 @@
 @use "sass:math";
+// body font
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap");
+// suits
 @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP&display=swap&text=%E2%99%A3%E2%99%A6%E2%99%A5%E2%99%A0%E2%98%85");
+// ranks (B, R used for jokers)
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@600&display=swap&text=0123456789JQKABR");
 
 html {
-  font-family: "Noto Sans JP", "IBM Plex Sans", sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
   line-height: 1.2;
 }
 
 body {
   margin: 0;
+  --gray-0: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-900: #111827;
+  --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 button {
-  background: transparent;
-  border: 1px solid black;
+  background: var(--gray-200);
+  border: none;
   color: inherit;
   font: inherit;
   height: 1.5em;
-  margin: 0 0.2em;
-  padding: 0 0.3em;
-  min-width: 4em;
+  padding: 0.1em 0.5em 0;
 
   &:hover {
-    background: #0002;
+    background: var(--gray-300);
   }
+}
+
+$rot: 90;
+@for $i from 0 through 5 {
+  .rot-#{$i} {
+    left: math.percentage(math.div(math.cos($rot * 1deg), 2) + 0.5);
+    top: math.percentage(math.div(math.sin($rot * 1deg), 2) + 0.5);
+  }
+  $rot: $rot + 60;
 }
 
 // global layout

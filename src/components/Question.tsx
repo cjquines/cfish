@@ -17,16 +17,17 @@ namespace PlayerTarget {
   export type Props = {
     id: string;
     relations: Relation[];
+    seat: SeatID;
     [more: string]: any;
   };
 }
 
 class PlayerTarget extends React.Component<PlayerTarget.Props> {
   render() {
-    const { id, relations, ...props } = this.props;
+    const { id, relations, seat, ...props } = this.props;
 
     return (
-      <div className="playerTarget">
+      <div className={`playerTarget rot-${seat}`}>
         <ArcherElement id={id} relations={relations} {...props}>
           <div className="playerTargetInt"></div>
         </ArcherElement>
@@ -75,6 +76,7 @@ export class Question extends React.Component<Question.Props> {
             <PlayerTarget
               key={seat}
               id={String(seat)}
+              seat={seat}
               relations={relations(seat)}
               {...props}
             />
