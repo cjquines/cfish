@@ -182,28 +182,42 @@ $rot: 90;
   }
 }
 
+// subtable
+
 .config {
   display: flex;
   flex-direction: row;
+}
 
-  .option {
-    display: flex;
-    flex-direction: column;
+.option {
+  align-items: center;
+  background-color: var(--gray-100);
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.25rem;
+  padding: 0.5rem;
+
+  .title {
+    margin-bottom: 0.5rem;
   }
 
   button {
-    background: #bbb;
-
-    &:disabled {
-      background: transparent;
-
-      &:hover {
-        background: transparent;
-      }
-    }
+    background: var(--gray-300);
+    color: var(--gray-600);
+    width: 100%;
 
     &:hover {
-      background: #ddd;
+      background: var(--gray-50);
+      color: var(--gray-900);
+    }
+
+    &:disabled {
+      background: var(--gray-100);
+      color: var(--gray-900);
+
+      &:hover {
+        background: var(--gray-100);
+      }
     }
   }
 }

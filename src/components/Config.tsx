@@ -41,56 +41,60 @@ export class Config extends React.Component<Config.Props> {
     return (
       <div className="config">
         <div className="option">
+          <div className="title">bluff</div>
           {this.renderOption(
-            "no bluff",
+            "no",
             "bluff",
             CFish.BluffRule.NO,
             "people cannot ask for cards they own"
           )}
           {this.renderOption(
-            "yes bluff",
+            "yes",
             "bluff",
             CFish.BluffRule.YES,
             "people can ask for cards they own"
           )}
         </div>
         <div className="option">
+          <div className="title">declare</div>
           {this.renderOption(
-            "declare any time",
+            "any time",
             "declare",
             CFish.DeclareRule.DURING_ASK,
             "people can declare any time, even not during their turn"
           )}
           {this.renderOption(
-            "declare during turn",
+            "during turn",
             "declare",
             CFish.DeclareRule.DURING_TURN,
             "people can only declare during their turn"
           )}
         </div>
         <div className="option">
+          <div className="title">hand size</div>
           {this.renderOption(
-            "public hand size",
+            "public",
             "handSize",
             CFish.HandSizeRule.PUBLIC,
             "everyone knows how many cards people have"
           )}
           {this.renderOption(
-            "private hand size",
+            "private",
             "handSize",
             CFish.HandSizeRule.SECRET,
             "people only know whether or not someone has cards"
           )}
         </div>
         <div className="option">
+          <div className="title">log</div>
           {this.renderOption(
-            "log last action",
+            "last action",
             "log",
             CFish.LogRule.LAST_ACTION,
             "everyone can see the last action"
           )}
           {this.renderOption(
-            "log all actions",
+            "all actions",
             "log",
             CFish.LogRule.EVERYTHING,
             "everyone can see the history of every action"
