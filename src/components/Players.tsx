@@ -7,10 +7,10 @@ import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 
 const PlayerInt = (props: {
+  askBtn: JSX.Element | null;
+  cardSelector: (update: () => void) => JSX.Element | null;
   name: string;
   seatBtn: JSX.Element | null;
-  askBtn: JSX.Element | null;
-  cardSelector: (callback: () => void) => JSX.Element | null;
 }) => {
   const [outRef, setOutRef] = useState<HTMLElement>(null);
   const [inRef, setInRef] = useState<HTMLElement>(null);
@@ -59,7 +59,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
     const { engine } = client;
 
     const res = [];
-    res.push(`${client.nameOf(seat) ?? "empty"}`);
+    res.push(client.nameOf(seat));
     if (engine.handSize[seat] !== null) {
       res.push(`(${engine.handSize[seat]})`);
     }
@@ -88,14 +88,20 @@ export class Players extends React.Component<Players.Props, Players.State> {
     const { client } = this.props;
     const { engine } = client;
 
-    return engine.phase === C.Phase.ASK &&
+    if (
+      engine.phase === C.Phase.ASK &&
       engine.asker === engine.ownSeat &&
-      engine.teamOf(seat) !== engine.teamOf(engine.ownSeat) ? (
-      <button onClick={(e) => this.setState({ askee: seat })}>ask</button>
-    ) : null;
+      engine.teamOf(seat) !== engine.teamOf(engine.ownSeat)
+    )
+      return null;
+
+    const text = this.state.askee === null ? "ask" : "cancel";
+    const askee = this.state.askee === null ? seat : null;
+
+    return <button onClick={(e) => this.setState({ askee })}>{text}</button>;
   }
 
-  renderCardSelector(seat: SeatID, callback_: () => void) {
+  renderCardSelector(seat: SeatID, update: () => void) {
     const { client } = this.props;
     const { engine } = client;
 
@@ -115,7 +121,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
         close={() => this.setState({ askee: null })}
         disabled={disabled}
         suits={suits}
-        update={callback_}
+        update={update}
       />
     ) : null;
   }
@@ -124,18 +130,15 @@ export class Players extends React.Component<Players.Props, Players.State> {
     const { client } = this.props;
     const { engine, users } = client;
 
-    // TODO rotate seats?
     return (
       <div className="players">
         {engine.seats.map((seat) => (
           <div className={`player rot-${seat}`} key={seat}>
             <PlayerInt
+              askBtn={this.renderAskBtn(seat)}
+              cardSelector={(update) => this.renderCardSelector(seat, update)}
               name={this.renderName(seat)}
               seatBtn={this.renderSeatBtn(seat)}
-              askBtn={this.renderAskBtn(seat)}
-              cardSelector={(callback) =>
-                this.renderCardSelector(seat, callback)
-              }
             />
           </div>
         ))}

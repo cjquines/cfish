@@ -3,15 +3,17 @@ import React from "react";
 import { Card, fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
+import { Protocol as P } from "lib/protocol";
 
-export namespace Users {
+export namespace Info {
   export type Props = {
     active: boolean;
     client: Client;
+    lone: boolean;
   };
 }
 
-export class Users extends React.Component<Users.Props> {
+export class Info extends React.Component<Info.Props> {
   rename(): void {
     const { client } = this.props;
 
@@ -46,24 +48,30 @@ export class Users extends React.Component<Users.Props> {
     );
   }
 
+  renderUser(user: P.User) {
+    const { client } = this.props;
+    const host = client.engine.host === user.id;
+
+    return (
+      <li key={user.id}>
+        {user.name}
+        {host ? " (host)" : ""}
+        {client.identity.id === user.id ? (
+          <button onClick={(e) => this.rename()}>rename</button>
+        ) : null}
+      </li>
+    );
+  }
+
   render() {
-    const { active, client } = this.props;
+    const { active, client, lone } = this.props;
     const { engine, users } = client;
 
     return (
-      <div className={`info ${active ? "active" : ""}`}>
+      <div className={`info ${active ? "active" : ""} ${lone ? "lone" : ""}`}>
         <div className="users">
           <p>users:</p>
-          <ul>
-            {users.map((user) => (
-              <li key={user.id}>
-                {user.name}
-                {client.identity.id === user.id ? (
-                  <button onClick={(e) => this.rename()}>rename</button>
-                ) : null}
-              </li>
-            ))}
-          </ul>
+          <ul>{users.map((user) => this.renderUser(user))}</ul>
         </div>
         <div className="teams">
           {this.renderTeam(C.Team.FIRST)}

@@ -2,14 +2,14 @@ import React from "react";
 import {
   DragDropContext,
   Droppable,
-  DropResult,
   DroppableProvided,
   DroppableStateSnapshot,
+  DropResult,
 } from "react-beautiful-dnd";
 
 import { Card } from "components/Card";
 import {
-  Card as Card_,
+  Card as CardT,
   FishSuit,
   fishSuitToString,
   genFishSuit,
@@ -19,7 +19,7 @@ import { Client } from "lib/client";
 
 namespace DeclareArea {
   export type Props = {
-    cards: Card_[];
+    cards: CardT[];
     provided: DroppableProvided;
     seat: SeatID | "unset";
     snapshot: DroppableStateSnapshot;
@@ -49,14 +49,13 @@ class DeclareArea extends React.Component<DeclareArea.Props> {
 
 export namespace Declare {
   export type Props = {
-    // callback: (owners: Record<string, SeatID>) => void;
     client: Client;
     seats: SeatID[];
     suit: FishSuit;
   };
 
   export type State = {
-    cards: Record<SeatID | "unset", Card_[]>;
+    cards: Record<SeatID | "unset", CardT[]>;
   };
 }
 
@@ -74,22 +73,29 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
     this.state = { cards };
   }
 
-  onDragEnd(result: DropResult): void {
+  onDragEnd(result: DropResult) {
+    const { cards } = this.state;
     const { source, destination } = result;
     if (!destination) return;
 
-    const [card] = this.state.cards[source.droppableId].splice(source.index, 1);
-    const newCards = [...this.state.cards[destination.droppableId]];
-    newCards.splice(destination.index, 0, card);
+    const srcId = source.droppableId;
+    const destId = destination.droppableId;
+    const srcIdx = source.index;
+    const destIdx = destination.index;
+
+    const [card] = cards[srcId].splice(srcIdx, 1);
+    const newCards = [...cards[destId]];
+    newCards.splice(destIdx, 0, card);
+
     this.setState({
       cards: {
-        ...this.state.cards,
-        [destination.droppableId]: newCards,
+        ...cards,
+        [destId]: newCards,
       },
     });
   }
 
-  submit(): void {
+  submit() {
     let owners = {};
     for (const seat of this.props.seats) {
       for (const card of this.state.cards[seat]) {
@@ -103,40 +109,30 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
     const { client, seats, suit } = this.props;
     const { engine } = client;
 
+    const ids: (number | "unset")[] = [...seats, "unset"];
+    const disabled = this.state.cards["unset"].length > 0;
+
     return (
       <div className="declare">
         <DragDropContext onDragEnd={(result) => this.onDragEnd(result)}>
-          {seats.map((seat) => (
+          {ids.map((id) => (
             <Droppable
               direction="horizontal"
-              droppableId={seat.toString()}
-              key={seat}
+              droppableId={id.toString()}
+              key={id}
             >
               {(provided, snapshot) => (
                 <DeclareArea
-                  cards={this.state.cards[seat]}
+                  cards={this.state.cards[id]}
                   provided={provided}
+                  seat={id}
                   snapshot={snapshot}
-                  seat={seat}
                 />
               )}
             </Droppable>
           ))}
-          <Droppable direction="horizontal" droppableId="unset">
-            {(provided, snapshot) => (
-              <DeclareArea
-                cards={this.state.cards["unset"]}
-                provided={provided}
-                snapshot={snapshot}
-                seat={"unset"}
-              />
-            )}
-          </Droppable>
         </DragDropContext>
-        <button
-          disabled={this.state.cards["unset"].length > 0}
-          onClick={(e) => this.submit()}
-        >
+        <button disabled={disabled} onClick={(e) => this.submit()}>
           submit
         </button>
       </div>

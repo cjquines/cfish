@@ -11,7 +11,7 @@ export namespace CardArea {
 }
 
 export class CardArea extends React.Component<CardArea.Props> {
-  onDragEnd(result: DropResult): void {
+  onDragEnd(result: DropResult) {
     const { source, destination } = result;
     if (!destination) return;
 

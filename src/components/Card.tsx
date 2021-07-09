@@ -1,13 +1,13 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 
-import { Card as Card_ } from "lib/cards";
+import { Card as CardT, cardSuitToSymbol, rankToSymbol } from "lib/cards";
 import { Client } from "lib/client";
 
 export namespace CardSpan {
   export type Props = {
     break?: boolean;
-    card: Card_;
+    card: CardT;
   };
 }
 
@@ -15,14 +15,13 @@ export class CardSpan extends React.Component<CardSpan.Props> {
   render() {
     const { card } = this.props;
     const color = card.color();
-    const symbol = card.symbol();
-    // jank, fix this
-    const suit = symbol.slice(-1);
-    const rank = this.props.break && suit === "★" ? "" : symbol.slice(0, -1);
+    const suit = cardSuitToSymbol(card.cardSuit);
+    const rank =
+      this.props.break && suit === "★" ? "" : rankToSymbol(card.rank);
 
     return (
       <span className="cardSpan" style={{ color }}>
-        {rank ? (
+        {rank !== "" ? (
           <>
             <span className="rank">{rank}</span>
             {this.props.break ? <br /> : null}
@@ -36,7 +35,7 @@ export class CardSpan extends React.Component<CardSpan.Props> {
 
 export namespace Card {
   export type Props = {
-    card: Card_;
+    card: CardT;
     index: number;
   };
 }

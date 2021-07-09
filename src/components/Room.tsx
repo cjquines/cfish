@@ -3,13 +3,13 @@ import { withRouter } from "react-router-dom";
 import { RouteComponentProps } from "react-router";
 
 import { Action } from "components/Action";
-import { Config } from "components/Config";
 import { CardArea } from "components/CardArea";
+import { Config } from "components/Config";
 import { Declare } from "components/Declare";
+import { Info } from "components/Info";
 import { Log } from "components/Log";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
-import { Users } from "components/Users";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
@@ -26,7 +26,7 @@ export namespace Room {
     client: Client | null;
     name: string;
     room: string;
-    sidebar: "closed" | "users" | "log";
+    sidebar: "closed" | "info" | "log";
   };
 }
 
@@ -50,9 +50,37 @@ class Room extends React.Component<Room.Props, Room.State> {
     this.setState({ client });
   }
 
-  renderToggle(pane: "users" | "log") {
-    const { sidebar } = this.state;
+  renderDeclare() {
+    const { client } = this.state;
+    const { engine } = client;
+
+    if (engine.phase !== C.Phase.DECLARE || engine.ownSeat !== engine.declarer)
+      return null;
+
+    const seats = engine.seats.filter(
+      (seat) => engine.teamOf(seat) === engine.teamOf(engine.declarer)
+    );
+
+    return <Declare client={client} suit={engine.declaredSuit} seats={seats} />;
+  }
+
+  renderSubaction() {
+    const { client, sidebar } = this.state;
+    const { engine } = client;
+
+    if (engine.phase === C.Phase.WAIT && engine.identity === engine.host)
+      return <Config client={client} />;
+
+    if (engine.ownHand !== null) return <CardArea client={client} />;
+
+    return null;
+  }
+
+  renderToggle(pane: "info" | "log") {
+    const { client, sidebar } = this.state;
+    const { engine } = client;
     const label = sidebar !== pane ? `show ${pane}` : `hide ${pane}`;
+
     const onClick = (e) => {
       if (sidebar === pane) {
         this.setState({ ...this.state, sidebar: "closed" });
@@ -62,6 +90,27 @@ class Room extends React.Component<Room.Props, Room.State> {
     };
 
     return <button onClick={onClick}>{label}</button>;
+  }
+
+  renderSidebar() {
+    const { client, sidebar } = this.state;
+    const { engine } = client;
+    const logvis = engine.rules.log === C.LogRule.EVERYTHING;
+
+    return (
+      <>
+        <Info active={sidebar === "info"} client={client} lone={!logvis} />
+        {logvis ? <Log active={sidebar === "log"} client={client} /> : null}
+        <div
+          className={`toggles ${
+            this.state.sidebar === "closed" ? "" : "active"
+          }`}
+        >
+          {this.renderToggle("info")}
+          {logvis ? this.renderToggle("log") : null}
+        </div>
+      </>
+    );
   }
 
   render() {
@@ -90,34 +139,12 @@ class Room extends React.Component<Room.Props, Room.State> {
           <div className="table">
             <Players client={client} />
             <Question client={client} />
-            {engine.phase !== C.Phase.DECLARE ||
-            engine.ownSeat !== engine.declarer ? null : (
-              <Declare
-                client={client}
-                suit={engine.declaredSuit}
-                seats={engine.seats.filter(
-                  (seat) =>
-                    engine.teamOf(seat) === engine.teamOf(engine.declarer)
-                )}
-              />
-            )}
+            {this.renderDeclare()}
           </div>
           <Action client={client} />
-          {engine.phase === C.Phase.WAIT && engine.identity === engine.host ? (
-            <Config client={client} />
-          ) : null}
-          {engine.ownHand !== null ? <CardArea client={client} /> : null}
+          {this.renderSubaction()}
         </div>
-        <Users active={this.state.sidebar === "users"} client={client} />
-        <Log active={this.state.sidebar === "log"} client={client} />
-        <div
-          className={`toggles ${
-            this.state.sidebar === "closed" ? "" : "active"
-          }`}
-        >
-          {this.renderToggle("users")}
-          {this.renderToggle("log")}
-        </div>
+        {this.renderSidebar()}
       </div>
     );
   }

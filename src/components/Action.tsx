@@ -3,7 +3,6 @@ import React from "react";
 import { fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
-import { DeclareSelector } from "components/DeclareSelector";
 import { SuitSelector } from "components/SuitSelector";
 
 export namespace Action {
@@ -106,11 +105,11 @@ export class Action extends React.Component<Action.Props, Action.State> {
     const { client } = this.props;
     const { engine } = client;
 
-    if (engine.ownSeat === null) return null;
-    if (engine.phase !== C.Phase.ASK) return null;
     if (
-      engine.rules.declare === C.DeclareRule.DURING_TURN &&
-      engine.ownSeat !== engine.asker
+      engine.ownSeat === null ||
+      engine.phase !== C.Phase.ASK ||
+      (engine.rules.declare === C.DeclareRule.DURING_TURN &&
+        engine.ownSeat !== engine.asker)
     )
       return null;
 
@@ -132,27 +131,6 @@ export class Action extends React.Component<Action.Props, Action.State> {
     };
 
     return <SuitSelector callback={callback} close={close} />;
-  }
-
-  renderDeclareSelector(): JSX.Element | null {
-    const { client } = this.props;
-    const { engine } = client;
-
-    if (engine.phase !== C.Phase.DECLARE || engine.ownSeat !== engine.declarer)
-      return null;
-
-    const seats = engine.seats.filter(
-      (seat) => engine.teamOf(seat) === engine.teamOf(engine.declarer)
-    );
-
-    return (
-      <DeclareSelector
-        callback={(owners) => client.declare(owners)}
-        client={client}
-        suit={engine.declaredSuit}
-        seats={seats}
-      />
-    );
   }
 
   render() {

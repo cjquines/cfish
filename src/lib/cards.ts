@@ -1,6 +1,11 @@
 import { assert } from "chai";
 import _ from "lodash";
 
+enum Color {
+  BLACK = "#111827",
+  RED = "#ef4444",
+}
+
 export enum CardSuit {
   CLUBS,
   DIAMONDS,
@@ -61,6 +66,22 @@ export function fishSuitToString(fishSuit: FishSuit): string {
       return "High ♥";
     case FishSuit.EIGHTS:
       return "Eights";
+  }
+}
+
+export function fishSuitToColor(fishSuit: FishSuit): string {
+  switch (fishSuit) {
+    case FishSuit.LOW_CLUBS:
+    case FishSuit.HIGH_CLUBS:
+    case FishSuit.LOW_SPADES:
+    case FishSuit.HIGH_SPADES:
+    case FishSuit.EIGHTS:
+      return Color.BLACK;
+    case FishSuit.LOW_DIAMONDS:
+    case FishSuit.HIGH_DIAMONDS:
+    case FishSuit.LOW_HEARTS:
+    case FishSuit.HIGH_HEARTS:
+      return Color.RED;
   }
 }
 
@@ -169,19 +190,17 @@ export class Card {
   color(): string {
     switch (this.cardSuit) {
       case CardSuit.CLUBS:
-        return "#111827";
-      case CardSuit.DIAMONDS:
-        return "#EF4444";
       case CardSuit.SPADES:
-        return "#111827";
+        return Color.BLACK;
+      case CardSuit.DIAMONDS:
       case CardSuit.HEARTS:
-        return "#EF4444";
+        return Color.RED;
     }
     switch (this.rank) {
       case Rank.BLACK:
-        return "#111827";
+        return Color.BLACK;
       case Rank.RED:
-        return "#EF4444";
+        return Color.RED;
     }
   }
 
