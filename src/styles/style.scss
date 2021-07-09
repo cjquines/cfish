@@ -162,6 +162,32 @@ button {
   }
 }
 
+.config {
+  display: flex;
+  flex-direction: row;
+
+  .option {
+    display: flex;
+    flex-direction: column;
+  }
+
+  button {
+    background: #bbb;
+
+    &:disabled {
+      background: transparent;
+
+      &:hover {
+        background: transparent;
+      }
+    }
+
+    &:hover {
+      background: #ddd;
+    }
+  }
+}
+
 .action {
   margin: 1rem 0;
   text-align: center;
