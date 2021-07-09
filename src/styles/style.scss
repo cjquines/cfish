@@ -57,7 +57,7 @@ $rot: 90;
 
 .room {
   display: grid;
-  grid-template: 1fr 1fr / 15rem 1fr;
+  grid-template: 1fr 10rem / 15rem 1fr;
 }
 
 .game {
@@ -73,6 +73,36 @@ $rot: 90;
   display: none;
 }
 
+.info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+
+  p {
+    margin: 0.5rem 0;
+    text-align: center;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0.5rem 0;
+    padding: 0;
+  }
+}
+
+.teams {
+  display: flex;
+
+  .team {
+    width: 50%;
+  }
+
+  .score {
+    font-size: 3rem;
+    text-align: center;
+  }
+}
+
 @media screen and (max-width: 750px) {
   .room {
     display: flex;
@@ -86,23 +116,24 @@ $rot: 90;
     left: 0;
 
     &.active {
-      left: 15rem;
+      left: 17rem;
     }
   }
 
-  .users,
+  .info,
   .log {
     background: var(--gray-0);
     box-shadow: var(--shadow);
     bottom: 0;
     display: none;
     left: 0;
+    padding: 1rem;
     position: absolute;
     top: 0;
     width: 15rem;
 
     &.active {
-      display: block;
+      display: flex;
     }
   }
 }
@@ -167,7 +198,7 @@ $rot: 90;
   }
 
   .label {
-    background: #eee;
+    background: var(--gray-100);
     padding: 0.1rem;
   }
 }

@@ -40,7 +40,7 @@ export class Client {
 
   nameOf(id: UserID | SeatID): string {
     const user = this.findUser(id);
-    return user ? user.name : "an empty seat";
+    return user ? user.name : "no one";
   }
 
   stringify(

@@ -17,17 +17,17 @@ namespace PlayerTarget {
   export type Props = {
     id: string;
     relations: Relation[];
-    seat: SeatID;
+    rot: number;
     [more: string]: any;
   };
 }
 
 class PlayerTarget extends React.Component<PlayerTarget.Props> {
   render() {
-    const { id, relations, seat, ...props } = this.props;
+    const { id, relations, rot, ...props } = this.props;
 
     return (
-      <div className={`playerTarget rot-${seat}`}>
+      <div className={`playerTarget rot-${rot}`}>
         <ArcherElement id={id} relations={relations} {...props}>
           <div className="playerTargetInt"></div>
         </ArcherElement>
@@ -72,11 +72,11 @@ export class Question extends React.Component<Question.Props> {
     return (
       <div className="question">
         <ArcherContainer strokeColor="black">
-          {engine.seats.map((seat) => (
+          {engine.seats.map((seat, rot) => (
             <PlayerTarget
               key={seat}
               id={String(seat)}
-              seat={seat}
+              rot={rot}
               relations={relations(seat)}
               {...props}
             />
