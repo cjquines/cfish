@@ -38,10 +38,15 @@ export namespace CardSelector {
     close: () => void;
     disabled: Card[];
     suits: FishSuit[];
+    update: () => void;
   };
 }
 
 export class CardSelector extends React.Component<CardSelector.Props> {
+  componentDidMount() {
+    this.props.update();
+  }
+
   render() {
     const { callback, close, disabled, suits } = this.props;
 

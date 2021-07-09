@@ -224,13 +224,13 @@ button {
   }
 }
 
+.popWrap {
+  z-index: 5;
+}
+
 .cardSelector {
   background: #fff;
-  position: absolute;
-  left: -5em;
-  top: 100%;
   width: 18em;
-  z-index: 2;
 
   .row {
     button {

@@ -16,10 +16,12 @@
     "node": "16.x"
   },
   "dependencies": {
+    "@popperjs/core": "^2.9.2",
     "chai": "^4.3.4",
     "express": "^4.17.1",
     "lodash": "^4.17.21",
     "react-beautiful-dnd": "^13.1.0",
+    "react-popper": "^2.2.5",
     "react-router-dom": "^5.2.0",
     "socket.io": "^4.1.2",
     "socket.io-client": "^4.1.2",

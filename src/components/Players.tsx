@@ -1,9 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
+import { usePopper } from "react-popper";
 
 import { CardSelector } from "components/CardSelector";
 import { Card } from "lib/cards";
 import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
+
+const PlayerInt = (props: {
+  name: string;
+  seatBtn: JSX.Element | null;
+  askBtn: JSX.Element | null;
+  cardSelector: (callback: () => void) => JSX.Element | null;
+}) => {
+  const [outRef, setOutRef] = useState<HTMLElement>(null);
+  const [inRef, setInRef] = useState<HTMLElement>(null);
+  const { styles, attributes, update } = usePopper(outRef, inRef, {
+    placement: "bottom",
+  });
+
+  return (
+    <div className="playerInt" ref={setOutRef}>
+      {props.name}
+      {props.seatBtn}
+      {props.askBtn}
+      <div
+        className="popWrap"
+        ref={setInRef}
+        style={styles.popper}
+        {...attributes.popper}
+      >
+        {props.cardSelector(update)}
+      </div>
+    </div>
+  );
+};
 
 export namespace Players {
   export type Props = {
@@ -65,7 +95,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
     ) : null;
   }
 
-  renderCardSelector(seat: SeatID) {
+  renderCardSelector(seat: SeatID, callback_: () => void) {
     const { client } = this.props;
     const { engine } = client;
 
@@ -85,6 +115,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
         close={() => this.setState({ askee: null })}
         disabled={disabled}
         suits={suits}
+        update={callback_}
       />
     ) : null;
   }
@@ -98,12 +129,14 @@ export class Players extends React.Component<Players.Props, Players.State> {
       <div className="players">
         {engine.seats.map((seat) => (
           <div className="player" key={seat}>
-            <div className="playerInt">
-              {this.renderName(seat)}
-              {this.renderSeatBtn(seat)}
-              {this.renderAskBtn(seat)}
-              {this.renderCardSelector(seat)}
-            </div>
+            <PlayerInt
+              name={this.renderName(seat)}
+              seatBtn={this.renderSeatBtn(seat)}
+              askBtn={this.renderAskBtn(seat)}
+              cardSelector={(callback) =>
+                this.renderCardSelector(seat, callback)
+              }
+            />
           </div>
         ))}
       </div>

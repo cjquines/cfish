@@ -42,16 +42,16 @@ export class Config extends React.Component<Config.Props> {
       <div className="config">
         <div className="option">
           {this.renderOption(
-            "yes bluff",
-            "bluff",
-            CFish.BluffRule.YES,
-            "people can ask for cards they own"
-          )}
-          {this.renderOption(
             "no bluff",
             "bluff",
             CFish.BluffRule.NO,
             "people cannot ask for cards they own"
+          )}
+          {this.renderOption(
+            "yes bluff",
+            "bluff",
+            CFish.BluffRule.YES,
+            "people can ask for cards they own"
           )}
         </div>
         <div className="option">
