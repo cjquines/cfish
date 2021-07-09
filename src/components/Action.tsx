@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { usePopper } from "react-popper";
 
+import { LogItem } from "components/Log";
+import { SuitSelector } from "components/SuitSelector";
 import { Card, fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
-import { SuitSelector } from "components/SuitSelector";
 
 const ActionInt = (props: {
   declareBtn: JSX.Element | null;
@@ -52,7 +53,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     };
   }
 
-  renderText(): string {
+  renderText() {
     const { client } = this.props;
     const { engine } = client;
     const sfy = (key) => client.stringify(key);
@@ -84,7 +85,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     return "";
   }
 
-  renderTopButton(): JSX.Element | null {
+  renderTopButton() {
     const { client } = this.props;
     const { engine } = client;
 
@@ -115,7 +116,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     return null;
   }
 
-  renderSortButton(): JSX.Element | null {
+  renderSortButton() {
     const { client } = this.props;
     const { engine } = client;
 
@@ -129,7 +130,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     return <button onClick={onClick}>sort</button>;
   }
 
-  renderDeclareButton(): JSX.Element | null {
+  renderDeclareButton() {
     const { client } = this.props;
     const { engine } = client;
 
@@ -150,7 +151,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     );
   }
 
-  renderSuitSelector(update: () => void): JSX.Element | null {
+  renderSuitSelector(update: () => void) {
     const { client } = this.props;
     const { engine } = client;
 
@@ -182,7 +183,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     return (
       <div className="action">
         <div>
-          {this.renderText()} {this.renderTopButton()}
+          <LogItem item={this.renderText()} /> {this.renderTopButton()}
         </div>
         <ActionInt
           declareBtn={this.renderDeclareButton()}

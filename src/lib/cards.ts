@@ -238,6 +238,7 @@ export function* genFishSuit(suit: FishSuit): Generator<Card, void> {
 
 export class Hand {
   readonly cards: Card[] = [];
+  keepSorted: boolean = false;
 
   constructor(cards: Iterable<Card> | Hand) {
     if ("cards" in cards) {
@@ -263,6 +264,7 @@ export class Hand {
 
   insert(card: Card): void {
     this.cards.push(card);
+    if (this.keepSorted) this.sort();
   }
 
   remove(card: Card): void {
@@ -285,6 +287,7 @@ export class Hand {
   }
 
   sort(): void {
+    this.keepSorted = true;
     this.cards.sort((a, b) => a.compare(b));
   }
 
