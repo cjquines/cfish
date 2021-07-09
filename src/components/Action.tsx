@@ -1,6 +1,6 @@
 import React from "react";
 
-import { fishSuitToString } from "lib/cards";
+import { Card, fishSuitToString } from "lib/cards";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 import { SuitSelector } from "components/SuitSelector";
@@ -124,13 +124,18 @@ export class Action extends React.Component<Action.Props, Action.State> {
 
     if (!this.state.declaring) return null;
 
-    const close = () => this.setState({ declaring: false });
     const callback = (suit) => {
       client.initDeclare(suit);
       this.setState({ declaring: false });
     };
+    const close = () => this.setState({ declaring: false });
+    const disabled = Card.FISH_SUITS.filter(
+      (suit) => engine.declarerOf[suit] !== undefined
+    );
 
-    return <SuitSelector callback={callback} close={close} />;
+    return (
+      <SuitSelector callback={callback} close={close} disabled={disabled} />
+    );
   }
 
   render() {

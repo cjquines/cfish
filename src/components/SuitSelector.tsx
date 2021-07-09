@@ -29,19 +29,26 @@ export namespace SuitSelector {
   export type Props = {
     callback: (suit: FishSuit) => void;
     close: () => void;
+    disabled: FishSuit[];
   };
 }
 
 export class SuitSelector extends React.Component<SuitSelector.Props> {
   render() {
+    const { callback, close, disabled } = this.props;
+
     return (
       <div className="suitSelector">
         {Card.FISH_SUITS.map((suit, i) => (
-          <button key={i} onClick={(e) => this.props.callback(suit)}>
+          <button
+            disabled={disabled.some((suit_) => suit_ === suit)}
+            key={i}
+            onClick={(e) => callback(suit)}
+          >
             <SuitSpan suit={suit} />
           </button>
         ))}
-        <button onClick={(e) => this.props.close()}>close</button>
+        <button onClick={(e) => close()}>close</button>
       </div>
     );
   }
