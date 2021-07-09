@@ -7,6 +7,7 @@ import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 
 const PlayerInt = (props: {
+  active: boolean;
   askBtn: JSX.Element | null;
   cardSelector: (update: () => void) => JSX.Element | null;
   name: string;
@@ -19,7 +20,10 @@ const PlayerInt = (props: {
   });
 
   return (
-    <div className="playerInt" ref={setOutRef}>
+    <div
+      className={`playerInt ${props.active ? "active" : ""}`}
+      ref={setOutRef}
+    >
       {props.name}
       {props.seatBtn}
       {props.askBtn}
@@ -136,6 +140,7 @@ export class Players extends React.Component<Players.Props, Players.State> {
         {engine.seats.map((seat) => (
           <div className={`player rot-${seat}`} key={seat}>
             <PlayerInt
+              active={engine.activeSeat === seat}
               askBtn={this.renderAskBtn(seat)}
               cardSelector={(update) => this.renderCardSelector(seat, update)}
               name={this.renderName(seat)}

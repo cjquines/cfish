@@ -122,6 +122,17 @@ export class Engine extends Data {
 
   // getters
 
+  get activeSeat(): SeatID | null {
+    if (this.phase === CFish.Phase.ASK) {
+      return this.asker;
+    } else if (this.phase === CFish.Phase.ANSWER) {
+      return this.askee;
+    } else if (this.phase === CFish.Phase.DECLARE) {
+      return this.declarer;
+    }
+    return null;
+  }
+
   get numSeated(): number {
     return this.seats.filter((seat) => this.userOf[seat] !== null).length;
   }

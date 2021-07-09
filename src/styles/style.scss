@@ -189,6 +189,11 @@ $rot: 90;
   position: absolute;
   top: -2rem;
   width: 8rem;
+
+  &.active {
+    background: var(--gray-50);
+    filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.15));
+  }
 }
 
 .declare {
