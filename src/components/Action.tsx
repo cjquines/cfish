@@ -168,7 +168,6 @@ export class Action extends React.Component<Action.Props, Action.State> {
           {this.renderSortButton()}
           {this.renderDeclareButton()}
           {this.renderSuitSelector()}
-          {this.renderDeclareSelector()}
         </div>
       </div>
     );

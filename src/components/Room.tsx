@@ -5,6 +5,7 @@ import { RouteComponentProps } from "react-router";
 import { Action } from "components/Action";
 import { Config } from "components/Config";
 import { CardArea } from "components/CardArea";
+import { Declare } from "components/Declare";
 import { Log } from "components/Log";
 import { Players } from "components/Players";
 import { Question } from "components/Question";
@@ -89,6 +90,17 @@ class Room extends React.Component<Room.Props, Room.State> {
           <div className="table">
             <Players client={client} />
             <Question client={client} />
+            {engine.phase !== C.Phase.DECLARE ||
+            engine.ownSeat !== engine.declarer ? null : (
+              <Declare
+                client={client}
+                suit={engine.declaredSuit}
+                seats={engine.seats.filter(
+                  (seat) =>
+                    engine.teamOf(seat) === engine.teamOf(engine.declarer)
+                )}
+              />
+            )}
           </div>
           <Action client={client} />
           {engine.phase === C.Phase.WAIT && engine.identity === engine.host ? (

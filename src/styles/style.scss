@@ -168,13 +168,28 @@ $rot: 90;
   width: 8rem;
 }
 
-.declareArea {
-  height: 70%;
-  left: 20%;
-  padding: 0;
+.declare {
+  height: 100%;
+  left: 0;
   position: absolute;
-  top: 15%;
-  width: 60%;
+  top: 0;
+  width: 100%;
+
+  button {
+    background: var(--gray-300);
+    left: calc(50% - 2rem);
+    position: absolute;
+    top: calc(50% + 6rem);
+
+    &:disabled {
+      background: var(--gray-200);
+      color: var(--gray-500)
+    }
+
+    &:hover {
+      background: var(--gray-200);
+    }
+  }
 }
 
 .question {
@@ -265,27 +280,55 @@ $rot: 90;
   display: flex;
   left: -1.5rem;
   position: relative;
+}
+
+.declareArea {
+  position: absolute;
+
+  .declareInner {
+    background-color: var(--gray-300);
+    display: flex;
+    height: 5rem;
+    position: relative;
+    padding: 0.3rem 2.5rem 0.1rem 0.3rem;
+    left: -50%;
+    min-width: 1.5rem;
+  }
+
+  &.rot-unset {
+    left: 50%;
+    top: 50%;
+  }
 
   .cardFrame {
-    background-color: var(--gray-0);
-    display: block;
-    height: 6rem;
-    position: relative;
-    width: 2rem;
+    height: 4rem;
+    width: 1.5rem;
 
     .card {
-      background-color: var(--gray-0);
-      border: 1px solid var(--gray-200);
-      box-shadow: var(--shadow);
-      content: "";
-      display: block;
-      position: absolute;
-      padding: 0.3rem;
-      height: 100%;
-      width: 4rem;
-      top: 0;
-      left: 0;
+      width: 3rem;
     }
+  }
+}
+
+.cardFrame {
+  background-color: var(--gray-0);
+  display: block;
+  height: 6rem;
+  position: relative;
+  width: 2rem;
+
+  .card {
+    background-color: var(--gray-0);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    content: "";
+    display: block;
+    position: absolute;
+    padding: 0.3rem;
+    height: 100%;
+    width: 4rem;
+    top: 0;
+    left: 0;
   }
 }
 
