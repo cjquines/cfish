@@ -169,19 +169,19 @@ export class Card {
   color(): string {
     switch (this.cardSuit) {
       case CardSuit.CLUBS:
-        return "black";
+        return "#111827";
       case CardSuit.DIAMONDS:
-        return "red";
+        return "#EF4444";
       case CardSuit.SPADES:
-        return "black";
+        return "#111827";
       case CardSuit.HEARTS:
-        return "red";
+        return "#EF4444";
     }
     switch (this.rank) {
       case Rank.BLACK:
-        return "black";
+        return "#111827";
       case Rank.RED:
-        return "red";
+        return "#EF4444";
     }
   }
 

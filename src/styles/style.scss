@@ -73,30 +73,33 @@ $rot: 90;
   display: none;
 }
 
-@media screen and (max-width: 700px) {
+@media screen and (max-width: 750px) {
   .room {
     display: flex;
   }
 
   .toggles {
-    display: block;
+    display: flex;
+    flex-direction: column;
     position: absolute;
     top: 0;
     left: 0;
 
     &.active {
-      left: 90vw;
+      left: 15rem;
     }
   }
 
   .users,
   .log {
-    background: #fff;
+    background: var(--gray-0);
+    box-shadow: var(--shadow);
+    bottom: 0;
     display: none;
+    left: 0;
     position: absolute;
     top: 0;
-    left: 0;
-    width: 90vw;
+    width: 15rem;
 
     &.active {
       display: block;
@@ -104,81 +107,68 @@ $rot: 90;
   }
 }
 
+// table
+
 .table {
-  height: 20rem;
-  margin: 3rem;
+  margin: 2rem 3rem;
   position: relative;
+}
 
-  .players {
-    background-color: #eee;
-    border-radius: 50%;
-    height: 20rem;
+.players {
+  background-color: var(--gray-100);
+  border-radius: 50%;
+  height: 20rem;
+  position: relative;
+  width: 23rem;
+}
+
+.player {
+  position: absolute;
+}
+
+.playerInt {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  left: -4.5rem;
+  padding: 0.5rem;
+  position: absolute;
+  top: -2rem;
+  width: 8rem;
+}
+
+.question {
+  height: 70%;
+  left: 25%;
+  padding: 0;
+  position: absolute;
+  top: 15%;
+  width: 50%;
+
+  > div,
+  > div > div {
+    height: 100%;
+    width: 100%;
     position: relative;
-    width: 20rem;
-
-    .player {
-      align-items: center;
-      display: flex;
-      justify-content: center;
-      position: absolute;
-
-      $rot: 90;
-      @for $i from 1 through 6 {
-        &:nth-of-type(#{$i}) {
-          left: math.percentage(math.div(math.cos($rot * 1deg), 2) + 0.5);
-          top: math.percentage(math.div(math.sin($rot * 1deg), 2) + 0.5);
-        }
-        $rot: $rot + 60;
-      }
-    }
-
-    .playerInt {
-      background-color: #ddd;
-      height: fit-content;
-      min-height: 3rem;
-      padding: 0.5rem;
-      position: absolute;
-      width: 6rem;
-    }
   }
 
-  .question {
-    height: 60%;
-    left: 25%;
-    padding: 0;
+  .playerTarget {
     position: absolute;
-    top: 20%;
-    width: 50%;
 
-    > div,
-    > div > div {
-      height: 100%;
-      width: 100%;
-      position: relative;
-    }
+    // .playerTargetInt {
+    //   background: #aaa;
+    //   height: 1em;
+    //   left: -0.5rem;
+    //   position: relative;
+    //   width: 1rem;
+    //   top: -0.5rem;
+    //   z-index: 2;
+    // }
+  }
 
-    $rot: 90;
-    @for $i from 1 through 6 {
-      .playerTarget:nth-of-type(#{$i}) {
-        // background: #aaa;
-        height: 1em;
-        left: -0.5em;
-        position: relative;
-        top: -0.5em;
-        width: 1em;
-        z-index: 2;
-
-        left: math.percentage(math.div(math.cos($rot * 1deg), 2) + 0.45);
-        position: absolute;
-        top: math.percentage(math.div(math.sin($rot * 1deg), 2) + 0.45);
-      }
-      $rot: $rot + 60;
-    }
-
-    .label {
-      background: #eee;
-      padding: 0.1rem;
-    }
+  .label {
+    background: #eee;
+    padding: 0.1rem;
   }
 }
 
@@ -237,15 +227,16 @@ $rot: 90;
   position: relative;
 
   .cardFrame {
-    background-color: #fff;
+    background-color: var(--gray-0);
     display: block;
     height: 6rem;
     position: relative;
     width: 2rem;
 
     .card {
-      background-color: #fff;
-      border: 1px solid black;
+      background-color: var(--gray-0);
+      border: 1px solid var(--gray-200);
+      box-shadow: var(--shadow);
       content: "";
       display: block;
       position: absolute;
@@ -263,7 +254,7 @@ $rot: 90;
 }
 
 .cardSelector {
-  background: #fff;
+  background-color: var(--gray-0);
   width: 18em;
 
   .row {
@@ -312,6 +303,6 @@ $rot: 90;
   }
 
   .suit {
-    font-size: 1em;
+    font-family: "Noto Sans JP";
   }
 }

@@ -106,6 +106,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
     const { client } = this.props;
     const { engine } = client;
 
+    if (!engine.ownSeat) return null;
     if (engine.phase !== C.Phase.ASK) return null;
     if (
       engine.rules.declare === C.DeclareRule.DURING_TURN &&
