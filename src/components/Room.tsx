@@ -65,13 +65,19 @@ class Room extends React.Component<Room.Props, Room.State> {
 
   render() {
     const { client } = this.state;
-    if (client?.status === "disconnected") {
-      return <div className="game">you've been disconnected! reload the page to rejoin the game</div>;
-    } else if (client?.status !== "connected") {
+    
+    if (!client) {
       return <div className="game">loading...</div>;
     }
 
     const { engine } = client;
+
+    if (client?.status === "disconnected") {
+      return <div className="game">you've been disconnected! reload the page to rejoin the game</div>;
+    }
+    if (!client?.engine) {
+      return <div className="game">loading...</div>;
+    }
 
     return (
       <div className="room">

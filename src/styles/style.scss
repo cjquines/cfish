@@ -12,6 +12,23 @@ body {
   margin: 0;
 }
 
+button {
+  background: transparent;
+  border: 1px solid black;
+  color: inherit;
+  font: inherit;
+  height: 1.5em;
+  margin: 0 0.2em;
+  padding: 0 0.3em;
+  min-width: 4em;
+
+  &:hover {
+    background: #0002;
+  }
+}
+
+// global layout
+
 .wrapper {
   display: flex;
   justify-content: center;
@@ -68,8 +85,8 @@ body {
 }
 
 .table {
-  min-height: 20rem;
-  margin: 3rem 0 6rem;
+  height: 20rem;
+  margin: 3rem;
   position: relative;
 
   .players {
@@ -97,9 +114,11 @@ body {
 
     .playerInt {
       background-color: #ddd;
-      height: 5rem;
+      height: fit-content;
+      min-height: 3rem;
+      padding: 0.5rem;
       position: absolute;
-      width: 5rem;
+      width: 6rem;
     }
   }
 
