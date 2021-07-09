@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CardSpan } from "components/CardArea";
+import { CardSpan } from "components/Card";
 import { Card, FishSuit, fishSuitToString, genFishSuit } from "lib/cards";
 
 namespace CardSelectorRow {

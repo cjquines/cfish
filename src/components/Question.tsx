@@ -7,7 +7,7 @@ import {
   ValidLineStyles,
 } from "react-archer";
 
-import { CardSpan } from "components/CardArea";
+import { CardSpan } from "components/Card";
 import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
 

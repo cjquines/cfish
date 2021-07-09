@@ -3,7 +3,6 @@ import React from "react";
 import { Card, FishSuit, fishSuitToString, genFishSuit } from "lib/cards";
 import { CFish as C, SeatID } from "lib/cfish";
 import { Client } from "lib/client";
-import { Protocol as P } from "lib/protocol";
 
 namespace DeclareRow {
   export type Props = {

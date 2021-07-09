@@ -65,7 +65,7 @@ class Room extends React.Component<Room.Props, Room.State> {
 
   render() {
     const { client } = this.state;
-    
+
     if (!client) {
       return <div className="game">loading...</div>;
     }
@@ -73,7 +73,11 @@ class Room extends React.Component<Room.Props, Room.State> {
     const { engine } = client;
 
     if (client?.status === "disconnected") {
-      return <div className="game">you've been disconnected! reload the page to rejoin the game</div>;
+      return (
+        <div className="game">
+          you've been disconnected! reload the page to rejoin the game
+        </div>
+      );
     }
     if (!client?.engine) {
       return <div className="game">loading...</div>;
