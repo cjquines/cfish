@@ -6,8 +6,11 @@ import { Card } from "lib/cards";
 import { CFish as C, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
 
-export type RoomID = string;
-export type UserID = string;
+enum RoomIDBrand { _ = "" };
+export type RoomID = RoomIDBrand & string;
+
+enum UserIDBrand { _ = "" };
+export type UserID = UserIDBrand & string;
 
 export class Room {
   engine: Engine;
@@ -213,12 +216,13 @@ export class Server {
 
     this.socket.on("connect", (client) => {
       this.clients[client.id] = client;
+      const id = client.id as UserIDBrand;
 
-      client.on("join", (room, name) => this.join(client.id, room, name));
-      client.on("reset", () => this.reset(client.id));
-      client.on("event", (event) => this.event(client.id, event));
-      client.on("rename", (name) => this.rename(client.id, name));
-      client.on("disconnect", () => this.leave(client.id));
+      client.on("join", (room, name) => this.join(id, room, name));
+      client.on("reset", () => this.reset(id));
+      client.on("event", (event) => this.event(id, event));
+      client.on("rename", (name) => this.rename(id, name));
+      client.on("disconnect", () => this.leave(id));
     });
   }
 

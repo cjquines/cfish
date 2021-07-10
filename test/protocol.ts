@@ -18,7 +18,7 @@ describe("Client/Server", () => {
     http.listen(() => {
       const port = (http.address() as any).port;
       url = `http://localhost:${port}`;
-      clients.push(new Client(url, "test", "a"));
+      clients.push(new Client(url, "test" as any, "a"));
       clients[0].connect();
       clients[0].socket.on("connect", () => done());
     });
@@ -53,11 +53,11 @@ describe("Client/Server", () => {
       if (count === 6) done();
     });
 
-    clients.push(new Client(url, "test", "b"));
-    clients.push(new Client(url, "test", "c"));
-    clients.push(new Client(url, "test", "d"));
-    clients.push(new Client(url, "test", "e"));
-    clients.push(new Client(url, "test", "f"));
+    clients.push(new Client(url, "test" as any, "b"));
+    clients.push(new Client(url, "test" as any, "c"));
+    clients.push(new Client(url, "test" as any, "d"));
+    clients.push(new Client(url, "test" as any, "e"));
+    clients.push(new Client(url, "test" as any, "f"));
     for (let i = 1; i < 6; i++) {
       clients[i].connect();
     }
