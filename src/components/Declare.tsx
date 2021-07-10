@@ -89,17 +89,12 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
   }
 
   move(srcId: string, srcIdx: number, destId: string, destIdx: number) {
-    const { cards } = this.state;
-    const [card] = cards[srcId].splice(srcIdx, 1);
-    const newCards = [...cards[destId]];
+    const { cards: oldCards } = this.state;
+    const [card] = oldCards[srcId].splice(srcIdx, 1);
+    const newCards = [...oldCards[destId]];
     newCards.splice(destIdx, 0, card);
-
-    this.setState({
-      cards: {
-        ...cards,
-        [destId]: newCards,
-      },
-    });
+    const cards = { ...oldCards, [destId]: newCards };
+    this.setState({ cards });
   }
 
   onDragEnd(result: DropResult) {

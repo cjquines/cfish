@@ -182,11 +182,11 @@ export class Room {
           hand: null,
           handSizes: this.engine.redactedHandSize,
         });
-        for (const seat of this.engine.seats) {
-          this.toSeat(seat, {
+        for (const seat_ of this.engine.seats) {
+          this.toSeat(seat_, {
             type: "startGameResponse",
             server: null,
-            hand: this.engine.handOf[seat],
+            hand: this.engine.handOf[seat_],
             handSizes: this.engine.redactedHandSize,
           });
         }

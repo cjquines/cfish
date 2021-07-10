@@ -266,9 +266,9 @@ export class Engine extends Data {
     }
     if (user === this.host) {
       this.host = null;
-      for (const seat of this.seats) {
-        if (this.userOf[seat] !== null) {
-          this.host = this.userOf[seat];
+      for (const seat_ of this.seats) {
+        if (this.userOf[seat_] !== null) {
+          this.host = this.userOf[seat_];
           // this.seats = this.rotatedSeats(this.host);
           break;
         }

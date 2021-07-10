@@ -12,6 +12,7 @@ import { Players } from "components/Players";
 import { Question } from "components/Question";
 import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
+import { RoomID } from "lib/server";
 
 export namespace Room {
   export type Match = {
@@ -23,10 +24,10 @@ export namespace Room {
   };
 
   export type State = {
-    client: Client | null;
-    name: string;
-    room: string;
-    sidebar: "closed" | "info" | "log";
+    client?: Client | null;
+    name?: string;
+    room?: string;
+    sidebar?: "closed" | "info" | "log";
   };
 }
 
@@ -46,7 +47,7 @@ class Room extends React.Component<Room.Props, Room.State> {
     const { client: client_, name, room } = this.state;
     if (client_ !== null) return;
 
-    const client = new Client(this.props.url, room, name);
+    const client = new Client(this.props.url, room as RoomID, name);
     client.onUpdate = (client: Client) => this.setState({ client });
     client.connect();
     this.setState({ client });
@@ -87,13 +88,8 @@ class Room extends React.Component<Room.Props, Room.State> {
     const { engine } = client;
     const label = sidebar !== pane ? `show ${pane}` : `hide ${pane}`;
 
-    const onClick = (e) => {
-      if (sidebar === pane) {
-        this.setState({ ...this.state, sidebar: "closed" });
-      } else {
-        this.setState({ ...this.state, sidebar: pane });
-      }
-    };
+    const onClick = (e) =>
+      this.setState({ sidebar: sidebar === pane ? "closed" : pane });
 
     return <button onClick={onClick}>{label}</button>;
   }
