@@ -19,6 +19,7 @@ export class Info extends React.Component<Info.Props> {
     const { client } = this.props;
 
     const name = window.prompt("enter your name") || "no name";
+    window.localStorage.setItem("name", name);
     client.attemptRename(name);
   }
 

@@ -36,18 +36,28 @@ class Room extends React.Component<Room.Props, Room.State> {
 
     this.state = {
       client: null,
-      name: window.prompt("enter your name") || "no name",
+      name: this.getName(),
       room: this.props.match.params.room,
       sidebar: "closed",
     };
   }
 
   componentDidMount() {
-    if (this.state.client !== null) return;
-    const client = new Client(this.props.url, this.state.room, this.state.name);
+    const { client: client_, name, room } = this.state;
+    if (client_ !== null) return;
+    
+    const client = new Client(this.props.url, room, name);
     client.onUpdate = (client: Client) => this.setState({ client });
     client.connect();
     this.setState({ client });
+  }
+
+  getName() {
+    const name =
+      window.localStorage.getItem("name") ??
+      (window.prompt("enter your name") || "no name");
+    window.localStorage.setItem("name", name);
+    return name;
   }
 
   renderDeclare() {
