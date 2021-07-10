@@ -17,18 +17,18 @@ describe("Engine", () => {
   });
 
   it("handles seating", () => {
-    (() => engine.addUser("a")).should.throw();
-    (() => engine.removeUser("g")).should.throw();
+    engine.addUser("a").should.be.instanceOf(CFish.Error);
+    engine.removeUser("g").should.be.instanceOf(CFish.Error);
 
     engine.addUser("g");
     engine.removeUser("g");
     engine.unseatAt(5);
 
     engine.users.length.should.equal(6);
-    (() => engine.seatAt("f", 0)).should.throw();
-    (() => engine.seatAt("f", 6)).should.throw();
-    (() => engine.seatAt("a", 1)).should.throw();
-    (() => engine.seatAt("g", 5)).should.throw();
+    engine.seatAt("f", 0).should.be.instanceOf(CFish.Error);
+    engine.seatAt("f", 6).should.be.instanceOf(CFish.Error);
+    engine.seatAt("a", 1).should.be.instanceOf(CFish.Error);
+    engine.seatAt("g", 5).should.be.instanceOf(CFish.Error);
 
     engine.seatAt("f", 5);
     engine.removeUser("a");
@@ -37,19 +37,19 @@ describe("Engine", () => {
     engine.users.length.should.equal(4);
     engine.numSeated.should.equal(4);
     engine.host.should.equal("c");
-    engine.seats.should.deep.equal([2, 3, 4, 5, 0, 1]);
-    (() => engine.startGame("a")).should.throw();
+    // engine.seats.should.deep.equal([2, 3, 4, 5, 0, 1]);
+    engine.startGame("a").should.be.instanceOf(CFish.Error);
 
     engine.addUser("a");
     engine.seatAt("a", 0);
     engine.addUser("b");
     engine.seatAt("b", 1);
 
-    (() => engine.startGame("a")).should.throw();
+    engine.startGame("a").should.be.instanceOf(CFish.Error);
 
     engine.startGame("c");
 
-    (() => engine.startGame("c")).should.throw();
+    engine.startGame("c").should.be.instanceOf(CFish.Error);
   });
 
   it("runs a basic game", () => {
