@@ -88,14 +88,25 @@ export class Players extends React.Component<Players.Props, Players.State> {
     );
   }
 
+  // also renders pass button
   renderAskBtn(seat: SeatID) {
     const { client } = this.props;
     const { engine } = client;
 
     if (
+      engine.phase === C.Phase.PASS &&
+      engine.asker === engine.ownSeat &&
+      engine.teamOf(seat) === engine.teamOf(engine.ownSeat) &&
+      seat !== engine.ownSeat &&
+      engine.handSize[seat] !== 0
+    )
+      return <button onClick={(e) => client.pass(seat)}>pass</button>;
+
+    if (
       engine.phase !== C.Phase.ASK ||
       engine.asker !== engine.ownSeat ||
-      engine.teamOf(seat) === engine.teamOf(engine.ownSeat)
+      engine.teamOf(seat) === engine.teamOf(engine.ownSeat) ||
+      engine.handSize[seat] === 0
     )
       return null;
 

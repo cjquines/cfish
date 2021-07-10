@@ -23,6 +23,7 @@ export class Client {
     this.socket.on("join", (user) => this.join(user));
     this.socket.on("reset", (data) => this.reset(data));
     this.socket.on("event", (event) => this.update(event));
+    this.socket.on("error", (error) => console.error(error));
     this.socket.on("rename", (user, name) => this.rename(user, name));
     this.socket.on("leave", (user) => this.leave(user));
   }
@@ -193,6 +194,12 @@ export class Client {
             : `${sfy("declarer")} incorrectly declared ${sfy("declaredSuit")}`
         );
         break;
+      case "pass":
+        this.engine.pass(event.passer, event.next);
+        this.log.push(
+          `${this.nameOf(event.passer)} passed the turn to ${sfy("asker")}`
+        );
+        break;
     }
     this.onUpdate?.(this);
   }
@@ -269,6 +276,14 @@ export class Client {
       type: "declare",
       declarer: this.engine.ownSeat,
       owners: owners,
+    });
+  }
+
+  pass(next: SeatID): void {
+    return this.attempt({
+      type: "pass",
+      passer: this.engine.ownSeat,
+      next: next,
     });
   }
 }

@@ -101,7 +101,9 @@ export class Room {
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
     const seat = this.engine.seatOf(user.id);
-    const error = (msg: string) => {};
+    const error = (msg: string) => {
+      this.socket.to(user.id).emit("error", msg);
+    };
     let result = null;
 
     switch (event.type) {
@@ -150,6 +152,12 @@ export class Room {
         if (seat !== event.declarer) return error("bad user");
         result = this.engine.declare(event.declarer, event.owners);
         if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "pass": {
+        if (seat !== event.passer) return error("bad user");
+        result = this.engine.pass(event.passer, event.next);
+        if (result instanceof C.Error) return error (result.msg);
         break;
       }
     }

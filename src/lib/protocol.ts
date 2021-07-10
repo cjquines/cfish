@@ -80,6 +80,12 @@ export namespace Protocol {
     handSizes: Record<SeatID, number> | null;
   };
 
+  export type Pass = {
+    type: "pass";
+    passer: SeatID;
+    next: SeatID;
+  }
+
   export type Event =
     | AddUser
     | SeatAt
@@ -92,5 +98,6 @@ export namespace Protocol {
     | Answer
     | InitDeclare
     | Declare
-    | DeclareResponse;
+    | DeclareResponse
+    | Pass;
 }

@@ -11,6 +11,7 @@ export namespace CFish {
     ASK, // waiting for someone to ask
     ANSWER, // waiting for someone to answer
     DECLARE, // waiting for someone to declare
+    PASS, // someone who's out to give turn to teammate
     FINISH, // game over
   }
 
@@ -396,7 +397,7 @@ export class Engine extends Data {
     this.phase = CFish.Phase.DECLARE;
   }
 
-  // DECLARE -> ASK / FINISH
+  // DECLARE -> ASK / PASS / FINISH
   // owners: Record<card as string, SeatID>
   // server response: correct or not
   declare(
@@ -450,12 +451,26 @@ export class Engine extends Data {
     if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
       // they win, hooray? what else?
       this.phase = CFish.Phase.FINISH;
-    } else {
+    } else if (this.handSize[this.asker] === 0) {
       // special case: person asking no longer has cards
+      this.phase = CFish.Phase.PASS;
+    } else {
       this.phase = CFish.Phase.ASK;
     }
 
     this.lastResponse = correct ? "good declare" : "bad declare";
+  }
+
+  // PASS -> ASK
+  pass(passer: SeatID, next: SeatID): CFish.Result {
+    if (this.phase !== CFish.Phase.PASS) return new CFish.Error("bad phase");
+    if (this.asker !== passer) return new CFish.Error("not passer");
+    if (this.handSize[passer] !== 0) return new CFish.Error("non-empty hand");
+    if (this.teamOf(passer) !== this.teamOf(next))
+      return new CFish.Error("different teams");
+
+    this.asker = next;
+    this.phase = CFish.Phase.ASK;
   }
 
   // FINISH -> WAIT
