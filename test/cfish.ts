@@ -56,41 +56,43 @@ describe("Engine", () => {
     engine.startGame("a", false);
     engine.asker.should.equal(0);
 
-    (() => engine.ask(1, 0, C.C_2)).should.throw;
-    (() => engine.ask(0, 1, C.C_2)).should.throw;
-    (() => engine.ask(0, 2, C.C_3)).should.throw;
+    engine.ask(1, 0, C.C_2).should.be.instanceOf(CFish.Error);
+    engine.ask(0, 1, C.C_2).should.be.instanceOf(CFish.Error);
+    engine.ask(0, 2, C.C_3).should.be.instanceOf(CFish.Error);
     engine.ask(0, 1, C.C_3);
-    (() => engine.answer(1, false)).should.throw;
+    engine.answer(1, false).should.be.instanceOf(CFish.Error);
     engine.answer(1, true);
     engine.lastResponse.should.equal("good ask");
 
     engine.ask(0, 1, C.C_4);
-    (() => engine.answer(1, true)).should.throw;
+    engine.answer(1, true).should.be.instanceOf(CFish.Error);
     engine.answer(1, false);
     engine.lastResponse.should.equal("bad ask");
 
-    (() => engine.ask(1, 0, C.C_2)).should.throw;
+    engine.ask(1, 0, C.C_2).should.be.instanceOf(CFish.Error);
     engine.ask(1, 0, C.C_A);
-    (() => engine.answer(1, true)).should.throw;
+    engine.answer(1, true).should.be.instanceOf(CFish.Error);
     engine.answer(0, true);
 
     engine.ask(1, 2, C.C_10);
     engine.answer(2, true);
     engine.ask(1, 4, C.C_Q);
-    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+    engine
+      .initDeclare(3, FishSuit.HIGH_CLUBS)
+      .should.be.instanceOf(CFish.Error);
     engine.answer(4, true);
 
     let owners = {};
     engine.initDeclare(3, FishSuit.HIGH_CLUBS);
-    (() => engine.declare(3, owners)).should.throw;
+    engine.declare(3, owners).should.be.instanceOf(CFish.Error);
     owners[String(C.C_9)] = 1;
     owners[String(C.C_10)] = 1;
     owners[String(C.C_Q)] = 1;
     owners[String(C.C_A)] = 1;
-    (() => engine.declare(3, owners)).should.throw;
+    engine.declare(3, owners).should.be.instanceOf(CFish.Error);
     owners[String(C.C_J)] = 3;
     owners[String(C.C_K)] = 4;
-    (() => engine.declare(3, owners)).should.throw;
+    engine.declare(3, owners).should.be.instanceOf(CFish.Error);
     owners[String(C.C_K)] = 5;
     engine.declare(3, owners);
 
@@ -99,7 +101,9 @@ describe("Engine", () => {
     engine.scoreOf(1).should.equal(1);
 
     owners = {};
-    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+    engine
+      .initDeclare(3, FishSuit.HIGH_CLUBS)
+      .should.be.instanceOf(CFish.Error);
 
     const trashDeclare = (declarer, suit, owner) => {
       engine.initDeclare(declarer, suit);
@@ -139,7 +143,9 @@ describe("Engine", () => {
     engine.startGame("a", false);
     engine.ask(0, 1, C.C_2);
     engine.answer(1, false);
-    (() => engine.initDeclare(3, FishSuit.HIGH_CLUBS)).should.throw;
+    engine
+      .initDeclare(3, FishSuit.HIGH_CLUBS)
+      .should.be.instanceOf(CFish.Error);
   });
 
   it("runs with people added/removed", () => {
