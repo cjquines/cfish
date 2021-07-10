@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import _ from "lodash";
 
 enum Color {
@@ -131,7 +130,7 @@ export class Card {
   readonly fishSuit: FishSuit;
 
   constructor(readonly cardSuit: CardSuit, readonly rank: Rank) {
-    assert.ok(Card.validate(cardSuit, rank));
+    // assert.ok(Card.validate(cardSuit, rank));
     this.fishSuit = Card.fishSuit(cardSuit, rank);
   }
 
@@ -269,7 +268,7 @@ export class Hand {
 
   remove(card: Card): void {
     const idx = this.cards.findIndex((card_) => card_.equals(card));
-    assert.notStrictEqual(idx, -1);
+    // assert.notStrictEqual(idx, -1);
     this.cards.splice(idx, 1);
   }
 

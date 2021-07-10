@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { io, Socket } from "socket.io-client";
 
 import { Card, FishSuit, fishSuitToString, Hand } from "lib/cards";

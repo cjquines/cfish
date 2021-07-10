@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import _ from "lodash";
 
 import { Card, FishSuit, genDeck, genFishSuit, Hand } from "lib/cards";
@@ -59,6 +58,16 @@ export namespace CFish {
     handSize: HandSizeRule.PUBLIC,
     log: LogRule.LAST_ACTION,
   };
+
+  export class Error {
+    constructor(readonly msg?: string) {}
+
+    toString(): string {
+      return this.msg;
+    }
+  }
+
+  export type Result<T = void> = T | Error;
 }
 
 export class Data {
@@ -219,26 +228,34 @@ export class Engine extends Data {
 
   // protocol actions
 
-  addUser(user: UserID): void {
-    assert.isNotOk(this.users.includes(user));
+  addUser(user: UserID): CFish.Result {
+    if (this.users.includes(user))
+      return new CFish.Error("user already joined");
+
     this.users.push(user);
     if (this.host === null) this.host = user;
   }
 
-  seatAt(user: UserID, seat: SeatID): void {
-    assert.isOk(this.users.includes(user));
-    assert.strictEqual(this.userOf[seat], null);
-    assert.strictEqual(this.seatOf(user), null);
+  seatAt(user: UserID, seat: SeatID): CFish.Result {
+    if (!this.users.includes(user))
+      return new CFish.Error("user doesn't exist");
+    if (this.userOf[seat] !== null) return new CFish.Error("seat occupied");
+    if (this.seatOf(user) !== null)
+      return new CFish.Error("user already seated");
+
     this.userOf[seat] = user;
   }
 
-  unseatAt(seat: SeatID): void {
-    assert.notStrictEqual(this.userOf[seat], null);
+  unseatAt(seat: SeatID): CFish.Result {
+    if (this.userOf[seat] === null) return new CFish.Error("seat is empty");
+
     this.userOf[seat] = null;
   }
 
-  removeUser(user: UserID): void {
-    assert.isOk(this.users.includes(user));
+  removeUser(user: UserID): CFish.Result {
+    if (!this.users.includes(user))
+      return new CFish.Error("user doesn't exist");
+
     _.remove(this.users, (user_) => user_ === user);
 
     const seat = this.seatOf(user);
@@ -250,7 +267,7 @@ export class Engine extends Data {
       for (const seat of this.seats) {
         if (this.userOf[seat] !== null) {
           this.host = this.userOf[seat];
-          this.seats = this.rotatedSeats(this.host);
+          // this.seats = this.rotatedSeats(this.host);
           break;
         }
       }
@@ -261,19 +278,20 @@ export class Engine extends Data {
   // first argument is always user/seat initiating
 
   // WAIT -> WAIT
-  setRules(user: UserID, rules: CFish.Rules): void {
-    assert.strictEqual(this.phase, CFish.Phase.WAIT);
-    assert.strictEqual(user, this.host);
+  setRules(user: UserID, rules: CFish.Rules): CFish.Result {
+    if (this.phase !== CFish.Phase.WAIT) return new CFish.Error("bad phase");
+    if (this.host !== user) return new CFish.Error("not host");
 
     this.rules = { ...rules };
   }
 
   // WAIT -> ASK
   // server response: player hands
-  startGame(user: UserID, shuffle: boolean = true): void {
-    assert.strictEqual(this.phase, CFish.Phase.WAIT);
-    assert.strictEqual(user, this.host);
-    assert.strictEqual(this.numSeated, this.rules.numPlayers);
+  startGame(user: UserID, shuffle: boolean = true): CFish.Result {
+    if (this.phase !== CFish.Phase.WAIT) return new CFish.Error("bad phase");
+    if (this.host !== user) return new CFish.Error("not host");
+    if (this.numSeated !== this.rules.numPlayers)
+      return new CFish.Error("not all seated");
 
     if (this.identity === null) {
       const deck = shuffle ? _.shuffle([...genDeck()]) : [...genDeck()];
@@ -299,7 +317,7 @@ export class Engine extends Data {
     server: null,
     hand: Hand | null,
     handSizes: Record<SeatID, number>
-  ): void {
+  ): CFish.Result {
     if (this.ownSeat !== null && hand !== null) {
       this.handOf[this.ownSeat] = new Hand(hand);
     }
@@ -310,17 +328,22 @@ export class Engine extends Data {
   }
 
   // ASK -> ANSWER
-  ask(asker: SeatID, askee: SeatID, card: Card): void {
-    assert.strictEqual(this.phase, CFish.Phase.ASK);
-    assert.strictEqual(this.asker, asker);
-    assert.notStrictEqual(this.teamOf(asker), this.teamOf(askee));
-
-    if (this.handOf[asker] !== null) {
-      assert.isOk(this.handOf[asker].hasSuit(card.fishSuit));
-      if (this.rules.bluff === CFish.BluffRule.NO) {
-        assert.isNotOk(this.handOf[asker].includes(card));
-      }
-    }
+  ask(asker: SeatID, askee: SeatID, card: Card): CFish.Result {
+    if (this.phase !== CFish.Phase.ASK) return new CFish.Error("bad phase");
+    if (this.asker !== asker) return new CFish.Error("not asker");
+    if (this.teamOf(asker) === this.teamOf(askee))
+      return new CFish.Error("same team");
+    if (
+      this.handOf[asker] !== null &&
+      !this.handOf[asker].hasSuit(card.fishSuit)
+    )
+      return new CFish.Error("hand doesn't have suit");
+    if (
+      this.handOf[asker] !== null &&
+      this.rules.bluff === CFish.BluffRule.NO &&
+      this.handOf[asker].includes(card)
+    )
+      return new CFish.Error("hand has asked card");
 
     this.askee = askee;
     this.askedCard = card;
@@ -328,13 +351,14 @@ export class Engine extends Data {
   }
 
   // ANSWER -> ASK
-  answer(askee: SeatID, response: boolean): void {
-    assert.strictEqual(this.phase, CFish.Phase.ANSWER);
-    assert.strictEqual(this.askee, askee);
-
-    if (this.handOf[askee] !== null) {
-      assert.strictEqual(this.handOf[askee].includes(this.askedCard), response);
-    }
+  answer(askee: SeatID, response: boolean): CFish.Result {
+    if (this.phase !== CFish.Phase.ANSWER) return new CFish.Error("bad phase");
+    if (this.askee !== askee) return new CFish.Error("not askee");
+    if (
+      this.handOf[askee] !== null &&
+      this.handOf[askee].includes(this.askedCard) !== response
+    )
+      return new CFish.Error("bad response");
 
     if (response) {
       if (this.handOf[this.asker] !== null) {
@@ -357,12 +381,15 @@ export class Engine extends Data {
   }
 
   // ASK -> DECLARE
-  initDeclare(declarer: SeatID, declaredSuit: FishSuit): void {
-    assert.strictEqual(this.phase, CFish.Phase.ASK);
-    assert.strictEqual(this.declarerOf[declaredSuit], undefined);
-    if (this.rules.declare === CFish.DeclareRule.DURING_TURN) {
-      assert.strictEqual(this.asker, declarer);
-    }
+  initDeclare(declarer: SeatID, declaredSuit: FishSuit): CFish.Result {
+    if (this.phase !== CFish.Phase.ASK) return new CFish.Error("bad phase");
+    if (this.declarerOf[declaredSuit] !== undefined)
+      return new CFish.Error("suit declared");
+    if (
+      this.rules.declare === CFish.DeclareRule.DURING_TURN &&
+      this.asker !== declarer
+    )
+      return new CFish.Error("declaring out of turn");
 
     this.declarer = declarer;
     this.declaredSuit = declaredSuit;
@@ -372,17 +399,20 @@ export class Engine extends Data {
   // DECLARE -> ASK / FINISH
   // owners: Record<card as string, SeatID>
   // server response: correct or not
-  declare(declarer: SeatID, owners: Record<string, SeatID>): boolean {
-    assert.strictEqual(this.phase, CFish.Phase.DECLARE);
-    assert.strictEqual(this.declarer, declarer);
+  declare(
+    declarer: SeatID,
+    owners: Record<string, SeatID>
+  ): CFish.Result<boolean> {
+    if (this.phase !== CFish.Phase.DECLARE) return new CFish.Error("bad phase");
+    if (this.declarer !== declarer) return new CFish.Error("not declarer");
 
     const team = this.teamOf(declarer);
     let correct = true;
 
     for (const card of genFishSuit(this.declaredSuit)) {
       const owner = owners[card.toString()];
-      assert.notStrictEqual(owner, undefined);
-      assert.strictEqual(team, this.teamOf(owner));
+      if (owner === undefined) return new CFish.Error("undefined owner");
+      if (this.teamOf(owner) !== team) return new CFish.Error("bad owner team");
       if (this.handOf[owner] !== null) {
         correct &&= this.handOf[owner].includes(card);
       }
@@ -406,7 +436,7 @@ export class Engine extends Data {
     server: null,
     correct: boolean,
     handSizes: Record<SeatID, number>
-  ): void {
+  ): CFish.Result {
     const team = this.teamOf(this.declarer);
     const scorer = correct ? team : 1 - team;
 

@@ -1,4 +1,3 @@
-import { assert } from "chai";
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 
@@ -41,14 +40,14 @@ export class Room {
 
   toSeat(seat: SeatID, event: P.Event): void {
     const id = this.engine.userOf[seat];
-    assert.notStrictEqual(id, null);
+    // assert.notStrictEqual(id, null);
     this.socket.to(id).emit("event", event);
   }
 
   // protocol actions
 
   join(user: P.User): void {
-    assert.strictEqual(this.findUser(user.id), null);
+    // assert.strictEqual(this.findUser(user.id), null);
     this.socket.to(user.id).emit("users", this.users);
     this.users.push(user);
 
@@ -62,7 +61,7 @@ export class Room {
 
   rename(user: P.User, name: string): void {
     const user_ = this.findUser(user.id);
-    assert.notStrictEqual(user_, null);
+    // assert.notStrictEqual(user_, null);
     user_.name = name;
 
     this.toAll("rename", user, name);
@@ -70,7 +69,7 @@ export class Room {
 
   leave(user: P.User): void {
     const idx = this.users.findIndex((user_) => user_.id === user.id);
-    assert.notStrictEqual(idx, -1);
+    // assert.notStrictEqual(idx, -1);
     this.users.splice(idx, 1);
     if (this.users.length === 0) {
       this.close();
@@ -101,24 +100,67 @@ export class Room {
   // process event from client and broadcast
   update(user: P.User, event: P.Event): void {
     const seat = this.engine.seatOf(user.id);
+    const error = (msg: string) => {};
+    let result = null;
+
+    switch (event.type) {
+      case "seatAt": {
+        result = this.engine.seatAt(event.user, event.seat);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "unseatAt": {
+        result = this.engine.unseatAt(event.seat);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "setRules": {
+        if (user.id !== event.user) return error("bad user");
+        result = this.engine.setRules(event.user, event.rules);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "startGame": {
+        if (user.id !== event.user) return error("bad user");
+        result = this.engine.startGame(event.user, event?.shuffle);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "ask": {
+        if (seat !== event.asker) return error("bad user");
+        const card = new Card(event.card.cardSuit, event.card.rank);
+        result = this.engine.ask(event.asker, event.askee, card);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "answer": {
+        if (seat !== event.askee) return error("bad user");
+        result = this.engine.answer(event.askee, event.response);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "initDeclare": {
+        if (seat !== event.declarer) return error("bad user");
+        result = this.engine.initDeclare(event.declarer, event.declaredSuit);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+      case "declare": {
+        if (seat !== event.declarer) return error("bad user");
+        result = this.engine.declare(event.declarer, event.owners);
+        if (result instanceof C.Error) return error(result.msg);
+        break;
+      }
+    }
 
     this.event(event);
 
     switch (event.type) {
-      case "seatAt":
-        this.engine.seatAt(event.user, event.seat);
+      case "seatAt": {
         this.reset(this.findUser(event.user));
-        return;
-      case "unseatAt":
-        this.engine.unseatAt(event.seat);
-        return;
-      case "setRules":
-        assert.strictEqual(user.id, event.user);
-        this.engine.setRules(event.user, event.rules);
-        return;
-      case "startGame":
-        assert.strictEqual(user.id, event.user);
-        this.engine.startGame(event.user, event?.shuffle);
+        break;
+      }
+      case "startGame": {
         this.event({
           type: "startGameResponse",
           server: null,
@@ -133,30 +175,17 @@ export class Room {
             handSizes: this.engine.redactedHandSize,
           });
         }
-        return;
-      case "ask":
-        assert.strictEqual(seat, event.asker);
-        const card = new Card(event.card.cardSuit, event.card.rank);
-        this.engine.ask(event.asker, event.askee, card);
-        return;
-      case "answer":
-        assert.strictEqual(seat, event.askee);
-        this.engine.answer(event.askee, event.response);
-        return;
-      case "initDeclare":
-        assert.strictEqual(seat, event.declarer);
-        this.engine.initDeclare(event.declarer, event.declaredSuit);
-        return;
-      case "declare":
-        assert.strictEqual(seat, event.declarer);
-        const correct = this.engine.declare(event.declarer, event.owners);
+        break;
+      }
+      case "declare": {
         this.event({
           type: "declareResponse",
           server: null,
-          correct: correct,
+          correct: result,
           handSizes: this.engine.redactedHandSize,
         });
-        return;
+        break;
+      }
     }
   }
 }
@@ -229,7 +258,7 @@ export class Server {
   }
 
   close(room: RoomID): void {
-    assert.notStrictEqual(this.rooms[room], undefined);
+    // assert.notStrictEqual(this.rooms[room], undefined);
     delete this.rooms[room];
   }
 }
