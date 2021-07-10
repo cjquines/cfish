@@ -64,6 +64,27 @@ $rot: 90;
   min-height: 100vh;
 }
 
+.splash {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  input {
+    height: 1.5rem;
+    font: inherit;
+    border: 1px solid var(--gray-500);
+    padding: 0.25rem;
+    margin: 0 0.5rem;
+    background: transparent;
+    width: 8rem;
+  }
+
+  button {
+    height: 2rem;
+  }
+}
+
 .room {
   display: grid;
   grid-template: 1fr 10rem / 15rem 1fr;
@@ -298,7 +319,7 @@ $rot: 90;
 }
 
 .action {
-  margin: 1rem 0;
+  margin: 2rem 0;
   text-align: center;
 
   > div {

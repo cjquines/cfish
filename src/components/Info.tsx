@@ -34,7 +34,13 @@ export class Info extends React.Component<Info.Props> {
           {engine.seats
             .filter((seat) => engine.teamOf(seat) === team)
             .map((seat) => (
-              <li key={seat}>{client.nameOf(seat)}</li>
+              <li key={seat}>
+                {seat === engine.ownSeat ? (
+                  <b>{client.nameOf(seat)}</b>
+                ) : (
+                  client.nameOf(seat)
+                )}
+              </li>
             ))}
         </ul>
         <p>suits:</p>

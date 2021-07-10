@@ -32,6 +32,7 @@ class Splash extends React.Component<Splash.Props, Splash.State> {
   render() {
     return (
       <div className="splash">
+        <p><b>cfish</b> · <a href="https://www.pagat.com/quartet/literature.html">rules</a></p>
         <form onSubmit={(e) => this.submit(e)}>
           <span>
             <label htmlFor="room">room:</label>
