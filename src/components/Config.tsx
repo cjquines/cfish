@@ -37,11 +37,12 @@ export class Config extends React.Component<Config.Props> {
   render() {
     const { client } = this.props;
     const { engine } = client;
+    const isHost = engine.identity === engine.host;
 
     return (
-      <div className="config">
+      <div className={`config ${isHost ? "" : "disabled"}`}>
         <div className="option">
-          <div className="title">bluff</div>
+          <div className="title">ask for<br/>own card</div>
           {this.renderOption(
             "no",
             "bluff",

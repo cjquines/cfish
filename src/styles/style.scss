@@ -228,7 +228,7 @@ $rot: 90;
   button {
     background: var(--gray-300);
     left: calc(50% - 2rem);
-    pointer-events: all;
+    pointer-events: auto;
     position: absolute;
     top: calc(50% + 6rem);
 
@@ -283,6 +283,19 @@ $rot: 90;
 .config {
   display: flex;
   flex-direction: row;
+
+  &.disabled {
+    pointer-events: none;
+
+    .option {
+      background: transparent;
+    }
+
+    button {
+      background: transparent;
+      color: transparent;
+    }
+  }
 }
 
 .option {
@@ -290,8 +303,10 @@ $rot: 90;
   background-color: var(--gray-100);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   margin: 0 0.25rem;
   padding: 0.5rem;
+  text-align: center;
 
   .title {
     margin-bottom: 0.5rem;
@@ -338,7 +353,7 @@ $rot: 90;
 }
 
 .declareArea {
-  pointer-events: all;
+  pointer-events: auto;
   position: absolute;
 
   .declareInner {

@@ -45,7 +45,7 @@ class Room extends React.Component<Room.Props, Room.State> {
   componentDidMount() {
     const { client: client_, name, room } = this.state;
     if (client_ !== null) return;
-    
+
     const client = new Client(this.props.url, room, name);
     client.onUpdate = (client: Client) => this.setState({ client });
     client.connect();
@@ -77,11 +77,8 @@ class Room extends React.Component<Room.Props, Room.State> {
     const { client, sidebar } = this.state;
     const { engine } = client;
 
-    if (engine.phase === C.Phase.WAIT && engine.identity === engine.host)
-      return <Config client={client} />;
-
+    if (engine.phase === C.Phase.WAIT) return <Config client={client} />;
     if (engine.ownHand !== null) return <CardArea client={client} />;
-
     return null;
   }
 
