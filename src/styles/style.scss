@@ -96,7 +96,7 @@ $rot: 90;
   flex-direction: column;
   grid-column: 2 / 3;
   grid-row: 1 / 3;
-  width: fit-content;
+  width: min-content;
 }
 
 .toggles {
@@ -491,7 +491,7 @@ $rot: 90;
 .suitSpan {
   display: block;
   text-align: center;
-  width: fit-content;
+  width: min-content;
 
   .rank {
     font-size: 1.1em;
