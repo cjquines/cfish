@@ -54,8 +54,7 @@ class Room extends React.Component<Room.Props, Room.State> {
     const { client } = this.state;
     const { engine } = client;
 
-    if (engine.phase !== C.Phase.DECLARE || engine.ownSeat !== engine.declarer)
-      return null;
+    if (engine.phase !== C.Phase.DECLARE) return null;
 
     const seats = engine.seats.filter(
       (seat) => engine.teamOf(seat) === engine.teamOf(engine.declarer)

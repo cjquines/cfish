@@ -12,7 +12,14 @@ export class Client {
   socket: Socket;
   status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
-  onUpdate: (state: this) => void | null;
+
+  declareMoveHook: (
+    srcId: string,
+    srcIdx: number,
+    destId: string,
+    destIdx: number
+  ) => void | null = null;
+  onUpdate: (state: this) => void | null = null;
 
   constructor(readonly url: string, public room: RoomID, public name: string) {
     this.socket = io(url);
@@ -179,6 +186,16 @@ export class Client {
           `${sfy("declarer")} began declaring ${sfy("declaredSuit")}`
         );
         break;
+      case "declareMove":
+        if (this.engine.ownSeat !== this.engine.declarer) {
+          this.declareMoveHook?.(
+            event.srcId,
+            event.srcIdx,
+            event.destId,
+            event.destIdx
+          );
+        }
+        break;
       case "declare":
         this.engine.declare(event.declarer, event.owners);
         break;
@@ -268,6 +285,21 @@ export class Client {
       type: "initDeclare",
       declarer: this.engine.ownSeat,
       declaredSuit: declaredSuit,
+    });
+  }
+
+  declareMove(
+    srcId: string,
+    srcIdx: number,
+    destId: string,
+    destIdx: number
+  ): void {
+    return this.attempt({
+      type: "declareMove",
+      srcId: srcId,
+      srcIdx: srcIdx,
+      destId: destId,
+      destIdx: destIdx,
     });
   }
 

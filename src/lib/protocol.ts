@@ -33,7 +33,7 @@ export namespace Protocol {
     type: "setRules";
     user: UserID;
     rules: C.Rules;
-  }
+  };
 
   export type StartGame = {
     type: "startGame";
@@ -67,6 +67,14 @@ export namespace Protocol {
     declaredSuit: FishSuit;
   };
 
+  export type DeclareMove = {
+    type: "declareMove";
+    srcId: string;
+    srcIdx: number;
+    destId: string;
+    destIdx: number;
+  };
+
   export type Declare = {
     type: "declare";
     declarer: SeatID;
@@ -84,7 +92,7 @@ export namespace Protocol {
     type: "pass";
     passer: SeatID;
     next: SeatID;
-  }
+  };
 
   export type Event =
     | AddUser
@@ -97,6 +105,7 @@ export namespace Protocol {
     | Ask
     | Answer
     | InitDeclare
+    | DeclareMove
     | Declare
     | DeclareResponse
     | Pass;

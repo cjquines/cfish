@@ -36,6 +36,7 @@ export class CardSpan extends React.Component<CardSpan.Props> {
 export namespace Card {
   export type Props = {
     card: CardT;
+    disabled?: boolean;
     index: number;
   };
 }
@@ -46,9 +47,10 @@ export class Card extends React.Component<Card.Props> {
 
     return (
       <Draggable
-        key={card.toString()}
         draggableId={card.toString()}
         index={index}
+        isDragDisabled={this.props.disabled ?? false}
+        key={card.toString()}
       >
         {(provided, snapshot) => (
           <div

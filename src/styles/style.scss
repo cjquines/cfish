@@ -199,6 +199,7 @@ $rot: 90;
 .declare {
   height: 100%;
   left: 0;
+  pointer-events: none;
   position: absolute;
   top: 0;
   width: 100%;
@@ -206,6 +207,7 @@ $rot: 90;
   button {
     background: var(--gray-300);
     left: calc(50% - 2rem);
+    pointer-events: all;
     position: absolute;
     top: calc(50% + 6rem);
 
@@ -315,6 +317,7 @@ $rot: 90;
 }
 
 .declareArea {
+  pointer-events: all;
   position: absolute;
 
   .declareInner {

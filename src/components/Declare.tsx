@@ -20,6 +20,7 @@ import { Client } from "lib/client";
 namespace DeclareArea {
   export type Props = {
     cards: CardT[];
+    disabled: boolean;
     provided: DroppableProvided;
     seat: SeatID | "unset";
     snapshot: DroppableStateSnapshot;
@@ -28,7 +29,7 @@ namespace DeclareArea {
 
 class DeclareArea extends React.Component<DeclareArea.Props> {
   render() {
-    const { cards, provided, seat, snapshot } = this.props;
+    const { cards, disabled, provided, seat, snapshot } = this.props;
 
     return (
       <div className={`declareArea rot-${seat}`}>
@@ -38,7 +39,12 @@ class DeclareArea extends React.Component<DeclareArea.Props> {
           {...provided.droppableProps}
         >
           {cards.map((card, i) => (
-            <Card card={card} key={card.toString()} index={i} />
+            <Card
+              card={card}
+              disabled={disabled}
+              key={card.toString()}
+              index={i}
+            />
           ))}
           {provided.placeholder}
         </div>
@@ -73,16 +79,17 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
     this.state = { cards };
   }
 
-  onDragEnd(result: DropResult) {
+  componentDidMount() {
+    this.props.client.declareMoveHook = (
+      srcId: string,
+      srcIdx: number,
+      destId: string,
+      destIdx: number
+    ) => this.move(srcId, srcIdx, destId, destIdx);
+  }
+
+  move(srcId: string, srcIdx: number, destId: string, destIdx: number) {
     const { cards } = this.state;
-    const { source, destination } = result;
-    if (!destination) return;
-
-    const srcId = source.droppableId;
-    const destId = destination.droppableId;
-    const srcIdx = source.index;
-    const destIdx = destination.index;
-
     const [card] = cards[srcId].splice(srcIdx, 1);
     const newCards = [...cards[destId]];
     newCards.splice(destIdx, 0, card);
@@ -93,6 +100,19 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
         [destId]: newCards,
       },
     });
+  }
+
+  onDragEnd(result: DropResult) {
+    const { source, destination } = result;
+    if (!destination) return;
+
+    const srcId = source.droppableId;
+    const destId = destination.droppableId;
+    const srcIdx = source.index;
+    const destIdx = destination.index;
+
+    this.props.client.declareMove(srcId, srcIdx, destId, destIdx);
+    this.move(srcId, srcIdx, destId, destIdx);
   }
 
   submit() {
@@ -111,6 +131,7 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
 
     const ids: (number | "unset")[] = [...seats, "unset"];
     const disabled = this.state.cards["unset"].length > 0;
+    const declaring = engine.declarer === engine.ownSeat;
 
     return (
       <div className="declare">
@@ -124,6 +145,7 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
               {(provided, snapshot) => (
                 <DeclareArea
                   cards={this.state.cards[id]}
+                  disabled={!declaring}
                   provided={provided}
                   seat={id}
                   snapshot={snapshot}
@@ -132,9 +154,11 @@ export class Declare extends React.Component<Declare.Props, Declare.State> {
             </Droppable>
           ))}
         </DragDropContext>
-        <button disabled={disabled} onClick={(e) => this.submit()}>
-          submit
-        </button>
+        {declaring ? (
+          <button disabled={disabled} onClick={(e) => this.submit()}>
+            submit
+          </button>
+        ) : null}
       </div>
     );
   }
