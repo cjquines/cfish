@@ -1,5 +1,7 @@
 import _ from "lodash";
 
+import { assert } from "lib/assert";
+
 enum Color {
   BLACK = "#111827",
   RED = "#ef4444",
@@ -130,7 +132,6 @@ export class Card {
   readonly fishSuit: FishSuit;
 
   constructor(readonly cardSuit: CardSuit, readonly rank: Rank) {
-    // assert.ok(Card.validate(cardSuit, rank));
     this.fishSuit = Card.fishSuit(cardSuit, rank);
   }
 
@@ -268,7 +269,7 @@ export class Hand {
 
   remove(card: Card): void {
     const idx = this.cards.findIndex((card_) => card_.equals(card));
-    // assert.notStrictEqual(idx, -1);
+    if (!assert(idx !== -1)) return;
     this.cards.splice(idx, 1);
   }
 

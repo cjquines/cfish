@@ -1,6 +1,7 @@
 import { Server as HTTPServer } from "http";
 import { Server as IOServer, Socket } from "socket.io";
 
+import { assert } from "lib/assert";
 import { Card } from "lib/cards";
 import { CFish as C, Engine, SeatID } from "lib/cfish";
 import { Protocol as P } from "lib/protocol";
@@ -40,14 +41,14 @@ export class Room {
 
   toSeat(seat: SeatID, event: P.Event): void {
     const id = this.engine.userOf[seat];
-    // assert.notStrictEqual(id, null);
+    if (!assert(id !== null)) return;
     this.socket.to(id).emit("event", event);
   }
 
   // protocol actions
 
   join(user: P.User): void {
-    // assert.strictEqual(this.findUser(user.id), null);
+    if (!assert(this.findUser(user.id) === null)) return;
     this.socket.to(user.id).emit("users", this.users);
     this.users.push(user);
 
@@ -61,7 +62,7 @@ export class Room {
 
   rename(user: P.User, name: string): void {
     const user_ = this.findUser(user.id);
-    // assert.notStrictEqual(user_, null);
+    if (!assert(user_ !== null)) return;
     user_.name = name;
 
     this.toAll("rename", user, name);
@@ -69,7 +70,7 @@ export class Room {
 
   leave(user: P.User): void {
     const idx = this.users.findIndex((user_) => user_.id === user.id);
-    // assert.notStrictEqual(idx, -1);
+    if (!assert(idx !== -1)) return;
     this.users.splice(idx, 1);
     if (this.users.length === 0) {
       this.close();
@@ -258,7 +259,7 @@ export class Server {
   }
 
   close(room: RoomID): void {
-    // assert.notStrictEqual(this.rooms[room], undefined);
+    if (!assert(this.rooms[room] !== undefined)) return;
     delete this.rooms[room];
   }
 }
