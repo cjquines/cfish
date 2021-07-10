@@ -101,7 +101,7 @@ class Room extends React.Component<Room.Props, Room.State> {
   renderSidebar() {
     const { client, sidebar } = this.state;
     const { engine } = client;
-    const logvis = engine.rules.log === C.LogRule.EVERYTHING;
+    const logvis = engine.rules.log !== C.LogRule.LAST_ACTION;
 
     return (
       <>

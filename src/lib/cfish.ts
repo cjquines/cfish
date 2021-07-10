@@ -41,6 +41,7 @@ export namespace CFish {
   // what should be shown in the log?
   export enum LogRule {
     LAST_ACTION,
+    LAST_TWO,
     EVERYTHING,
   }
 

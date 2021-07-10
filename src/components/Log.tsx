@@ -40,22 +40,21 @@ export class Log extends React.Component<Log.Props> {
   render() {
     const { active, client } = this.props;
     const { log, engine } = client;
-    const last = log?.[log.length - 1];
+    const num =
+      engine.rules.log === C.LogRule.LAST_ACTION
+        ? 2
+        : engine.rules.log === C.LogRule.LAST_TWO
+        ? 4
+        : null;
 
     return (
       <div className={`log ${active ? "active" : ""}`}>
         <ul>
-          {engine.rules.log === C.LogRule.EVERYTHING ? (
-            log.map((item, i) => (
-              <li key={i}>
-                <LogItem item={item} />
-              </li>
-            ))
-          ) : last ? (
-            <li>
-              <LogItem item={last} />
+          {log.slice(num === null ? 0 : -num).map((item, i) => (
+            <li key={i}>
+              <LogItem item={item} />
             </li>
-          ) : null}
+          ))}
         </ul>
       </div>
     );

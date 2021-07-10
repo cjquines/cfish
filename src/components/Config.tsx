@@ -1,6 +1,6 @@
 import React from "react";
 
-import { CFish } from "lib/cfish";
+import { CFish as C } from "lib/cfish";
 import { Client } from "lib/client";
 
 export namespace Config {
@@ -10,10 +10,10 @@ export namespace Config {
 }
 
 export class Config extends React.Component<Config.Props> {
-  renderOption<K extends keyof CFish.Rules>(
+  renderOption<K extends keyof C.Rules>(
     label: string,
     key: K,
-    val: CFish.Rules[K],
+    val: C.Rules[K],
     title: string
   ) {
     const { client } = this.props;
@@ -46,13 +46,13 @@ export class Config extends React.Component<Config.Props> {
           {this.renderOption(
             "no",
             "bluff",
-            CFish.BluffRule.NO,
+            C.BluffRule.NO,
             "people cannot ask for cards they own"
           )}
           {this.renderOption(
             "yes",
             "bluff",
-            CFish.BluffRule.YES,
+            C.BluffRule.YES,
             "people can ask for cards they own"
           )}
         </div>
@@ -61,13 +61,13 @@ export class Config extends React.Component<Config.Props> {
           {this.renderOption(
             "any time",
             "declare",
-            CFish.DeclareRule.DURING_ASK,
+            C.DeclareRule.DURING_ASK,
             "people can declare any time, even not during their turn"
           )}
           {this.renderOption(
             "during turn",
             "declare",
-            CFish.DeclareRule.DURING_TURN,
+            C.DeclareRule.DURING_TURN,
             "people can only declare during their turn"
           )}
         </div>
@@ -76,13 +76,13 @@ export class Config extends React.Component<Config.Props> {
           {this.renderOption(
             "public",
             "handSize",
-            CFish.HandSizeRule.PUBLIC,
+            C.HandSizeRule.PUBLIC,
             "everyone knows how many cards people have"
           )}
           {this.renderOption(
             "private",
             "handSize",
-            CFish.HandSizeRule.SECRET,
+            C.HandSizeRule.SECRET,
             "people only know whether or not someone has cards"
           )}
         </div>
@@ -91,13 +91,19 @@ export class Config extends React.Component<Config.Props> {
           {this.renderOption(
             "last action",
             "log",
-            CFish.LogRule.LAST_ACTION,
+            C.LogRule.LAST_ACTION,
             "everyone can see the last action"
+          )}
+          {this.renderOption(
+            "last two",
+            "log",
+            C.LogRule.LAST_TWO,
+            "everyone can see the last two actions"
           )}
           {this.renderOption(
             "all actions",
             "log",
-            CFish.LogRule.EVERYTHING,
+            C.LogRule.EVERYTHING,
             "everyone can see the history of every action"
           )}
         </div>
