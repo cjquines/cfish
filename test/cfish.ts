@@ -130,7 +130,7 @@ describe("Engine", () => {
 
     trashDeclare(0, FishSuit.EIGHTS, 0);
 
-    engine.phase.should.equal(CFish.Phase.FINISH);
+    engine.phase.should.equal(CFish.Phase.WAIT);
   });
 
   it("handles rules", () => {

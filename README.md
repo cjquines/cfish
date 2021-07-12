@@ -9,7 +9,7 @@ web app for playing the card game [canadian fish, also known as literature](http
 - think about overall layout again
 - color things not gray
 - allow declares to be canceled?
-- handle errors under than logging to console
+- handle errors other than logging to console
 - rotate seats so self is always at bottom
 - make logitem nicer
 - use actual card pictures

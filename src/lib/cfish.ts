@@ -12,7 +12,6 @@ export namespace CFish {
     ANSWER, // waiting for someone to answer
     DECLARE, // waiting for someone to declare
     PASS, // someone who's out to give turn to teammate
-    FINISH, // game over
   }
 
   export enum Team {
@@ -134,12 +133,16 @@ export class Engine extends Data {
   // getters
 
   get activeSeat(): SeatID | null {
-    if (this.phase === CFish.Phase.ASK) {
-      return this.asker;
-    } else if (this.phase === CFish.Phase.ANSWER) {
-      return this.askee;
-    } else if (this.phase === CFish.Phase.DECLARE) {
-      return this.declarer;
+    switch (this.phase) {
+      case CFish.Phase.WAIT:
+        return this.seatOf[this.host] ?? null;
+      case CFish.Phase.ASK:
+      case CFish.Phase.PASS:
+        return this.asker;
+      case CFish.Phase.ANSWER:
+        return this.askee;
+      case CFish.Phase.DECLARE:
+        return this.declarer;
     }
     return null;
   }
@@ -165,6 +168,13 @@ export class Engine extends Data {
       res[seat] = this.handSize[seat] === 0 ? 0 : null;
     }
     return res;
+  }
+
+  get winner(): CFish.Team | null {
+    const bound = Card.FISH_SUITS.length / 2;
+    if (this.scoreOf(CFish.Team.FIRST) > bound) return CFish.Team.FIRST;
+    if (this.scoreOf(CFish.Team.SECOND) > bound) return CFish.Team.SECOND;
+    return null;
   }
 
   indexOf(seat: SeatID): number {
@@ -398,7 +408,7 @@ export class Engine extends Data {
     this.phase = CFish.Phase.DECLARE;
   }
 
-  // DECLARE -> ASK / PASS / FINISH
+  // DECLARE -> ASK / PASS / WAIT
   // owners: Record<card as string, SeatID>
   // server response: correct or not
   declare(
@@ -449,11 +459,9 @@ export class Engine extends Data {
       this.handSize[this.ownSeat] = this.ownHand.size;
     }
 
-    if (this.scoreOf(scorer) > Card.FISH_SUITS.length / 2) {
-      // they win, hooray? what else?
-      this.phase = CFish.Phase.FINISH;
+    if (this.winner !== null) {
+      this.phase = CFish.Phase.WAIT;
     } else if (this.handSize[this.asker] === 0) {
-      // special case: person asking no longer has cards
       this.phase = CFish.Phase.PASS;
     } else {
       this.phase = CFish.Phase.ASK;
@@ -473,10 +481,6 @@ export class Engine extends Data {
     this.asker = next;
     this.phase = CFish.Phase.ASK;
   }
-
-  // FINISH -> WAIT
-  // newGame(host: SeatID): void
-  // just do a phase change?
 
   // debug
 

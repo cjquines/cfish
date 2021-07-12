@@ -400,6 +400,10 @@ $rot: 90;
     width: 4rem;
     top: 0;
     left: 0;
+
+    .cardSpan {
+      width: min-content;
+    }
   }
 }
 
@@ -491,7 +495,6 @@ $rot: 90;
 .suitSpan {
   display: block;
   text-align: center;
-  width: min-content;
 
   .rank {
     font-size: 1.1em;

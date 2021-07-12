@@ -16,11 +16,11 @@ export class App extends React.Component<App.Props> {
       <div className="wrapper">
         <Router>
           <Switch>
-            <Route exact path="/">
-              <Splash />
-            </Route>
             <Route path="/room/:room">
               <Room url={this.props.url} />
+            </Route>
+            <Route>
+              <Splash />
             </Route>
           </Switch>
         </Router>
