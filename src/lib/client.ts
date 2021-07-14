@@ -18,6 +18,7 @@ export class Client {
     | null = null;
   onUpdate: ((state: this) => void) | null = null;
   resetCardAnimHook: (() => void) | null = null;
+  resetShakeAnimHook: (() => void) | null = null;
 
   constructor(readonly url: string, public room: RoomID, public name: string) {
     this.socket = io(url);
@@ -179,6 +180,7 @@ export class Client {
             : `${sfy("askee")} did not have the ${sfy("askedCard")}`
         );
         this.resetCardAnimHook?.();
+        this.resetShakeAnimHook?.();
         break;
       case "initDeclare":
         this.engine.initDeclare(event.declarer, event.declaredSuit);

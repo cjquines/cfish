@@ -45,7 +45,8 @@ export namespace Players {
   };
 
   export type State = {
-    askee: number | null;
+    animDone?: boolean;
+    askee?: number | null;
   };
 }
 
@@ -54,8 +55,14 @@ export class Players extends React.Component<Players.Props, Players.State> {
     super(props);
 
     this.state = {
+      animDone: true,
       askee: null,
     };
+  }
+
+  componentDidMount() {
+    this.props.client.resetShakeAnimHook = () =>
+      this.setState({ animDone: false });
   }
 
   renderName(seat: SeatID) {
@@ -145,11 +152,17 @@ export class Players extends React.Component<Players.Props, Players.State> {
   render() {
     const { client } = this.props;
     const { engine, users } = client;
+    const animClass = (seat) =>
+      seat !== engine.asker || this.state.animDone ? "" : "shake";
 
     return (
       <div className="players">
         {engine.seats.map((seat) => (
-          <div className={`player rot-${seat}`} key={seat}>
+          <div
+            className={`player rot-${seat} ${animClass(seat)}`}
+            key={seat}
+            onAnimationEnd={(e) => this.setState({ animDone: true })}
+          >
             <PlayerInt
               active={engine.activeSeat === seat}
               askBtn={this.renderAskBtn(seat)}

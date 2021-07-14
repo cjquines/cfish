@@ -199,6 +199,32 @@ $rot: 90;
 
 .player {
   position: absolute;
+
+  &.shake {
+    animation: shake 1s;
+  }
+}
+
+@keyframes shake {
+  30% {
+    transform: translateX(-1rem);
+  }
+
+  60% {
+    transform: translateX(1rem);
+  }
+
+  80% {
+    transform: translateX(-0.5rem);
+  }
+
+  90% {
+    transform: translateX(0.3rem);
+  }
+
+  100% {
+    transform: translateX(0rem);
+  }
 }
 
 .playerInt {
@@ -288,7 +314,7 @@ $rotj: 90;
         top: math.percentage(math.div(math.sin($roti * 1deg), 2) + 0.5);
         opacity: 0%;
       }
-      
+
       10% {
         left: math.percentage(math.div(math.cos($roti * 1deg), 2) + 0.5);
         top: math.percentage(math.div(math.sin($roti * 1deg), 2) + 0.5);
