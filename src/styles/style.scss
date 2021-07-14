@@ -278,6 +278,69 @@ $rot: 90;
   }
 }
 
+$roti: 90;
+$rotj: 90;
+@for $i from 0 through 5 {
+  @for $j from 0 through 5 {
+    @keyframes rot-#{$i}-#{$j} {
+      0% {
+        left: math.percentage(math.div(math.cos($roti * 1deg), 2) + 0.5);
+        top: math.percentage(math.div(math.sin($roti * 1deg), 2) + 0.5);
+        opacity: 0%;
+      }
+      
+      10% {
+        left: math.percentage(math.div(math.cos($roti * 1deg), 2) + 0.5);
+        top: math.percentage(math.div(math.sin($roti * 1deg), 2) + 0.5);
+        opacity: 100%;
+      }
+
+      60% {
+        left: math.percentage(math.div(math.cos($rotj * 1deg), 2) + 0.5);
+        top: math.percentage(math.div(math.sin($rotj * 1deg), 2) + 0.5);
+        opacity: 100%;
+      }
+
+      90% {
+        opacity: 100%;
+      }
+
+      100% {
+        opacity: 0%;
+      }
+    }
+    $roti: $roti + 60;
+  }
+  $rotj: $rotj + 60;
+}
+
+.cardAnim {
+  height: 60%;
+  left: 25%;
+  padding: 0;
+  position: absolute;
+  top: 20%;
+  width: 50%;
+
+  .cardAnimate {
+    animation-duration: 3s;
+    height: fit-content;
+    position: absolute;
+    width: fit-content;
+  }
+
+  .cardSpan {
+    display: block;
+    background: var(--gray-0);
+    padding: 0.3rem;
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow);
+    left: -50%;
+    position: relative;
+    top: -50%;
+  }
+}
+
 // subtable
 
 .config {

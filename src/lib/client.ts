@@ -13,13 +13,11 @@ export class Client {
   status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
 
-  declareMoveHook: (
-    srcId: string,
-    srcIdx: number,
-    destId: string,
-    destIdx: number
-  ) => void | null = null;
-  onUpdate: (state: this) => void | null = null;
+  declareMoveHook:
+    | ((srcId: string, srcIdx: number, destId: string, destIdx: number) => void)
+    | null = null;
+  onUpdate: ((state: this) => void) | null = null;
+  resetCardAnimHook: (() => void) | null = null;
 
   constructor(readonly url: string, public room: RoomID, public name: string) {
     this.socket = io(url);
@@ -180,6 +178,7 @@ export class Client {
             ? `${sfy("askee")} gave ${sfy("asker")} the ${sfy("askedCard")}`
             : `${sfy("askee")} did not have the ${sfy("askedCard")}`
         );
+        this.resetCardAnimHook?.();
         break;
       case "initDeclare":
         this.engine.initDeclare(event.declarer, event.declaredSuit);

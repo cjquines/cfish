@@ -36,7 +36,7 @@ export class CardArea extends React.Component<CardArea.Props> {
               className="cardArea"
             >
               {engine.ownHand?.cards.map((card, i) => (
-                <Card card={card} index={i} />
+                <Card card={card} index={i} key={i} />
               ))}
               {provided.placeholder}
             </div>

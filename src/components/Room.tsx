@@ -3,6 +3,7 @@ import { withRouter } from "react-router-dom";
 import { RouteComponentProps } from "react-router";
 
 import { Action } from "components/Action";
+import { CardAnim } from "components/CardAnim";
 import { CardArea } from "components/CardArea";
 import { Config } from "components/Config";
 import { Declare } from "components/Declare";
@@ -142,6 +143,7 @@ class Room extends React.Component<Room.Props, Room.State> {
             <Players client={client} />
             <Question client={client} />
             {this.renderDeclare()}
+            <CardAnim client={client} />
           </div>
           <Action client={client} />
           {this.renderSubaction()}
