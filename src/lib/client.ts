@@ -156,6 +156,7 @@ export class Client {
         break;
       case "startGame":
         this.engine.startGame(event.user);
+        this.log = [];
         this.log.push(`${this.nameOf(event.user)} started the game`);
         break;
       case "startGameResponse":
@@ -210,6 +211,14 @@ export class Client {
             ? `${sfy("declarer")} correctly declared ${sfy("declaredSuit")}`
             : `${sfy("declarer")} incorrectly declared ${sfy("declaredSuit")}`
         );
+        if (this.engine.winner !== null) {
+          this.log.push(
+            `team ${this.engine.seats
+              .filter((seat) => this.engine.teamOf(seat) === this.engine.winner)
+              .map((seat) => this.nameOf(seat))
+              .join(", ")} won!`
+          );
+        }
         break;
       case "pass":
         this.engine.pass(event.passer, event.next);

@@ -58,11 +58,8 @@ export class Action extends React.Component<Action.Props, Action.State> {
     const { engine } = client;
     const sfy = (key) => client.stringify(key);
 
-    if (engine.winner !== null) {
-      return `team ${engine.seats
-        .filter((seat) => engine.teamOf(seat) === engine.winner)
-        .map((seat) => client.nameOf(seat))
-        .join(", ")} won!`;
+    if (engine.winner !== null && client.log.length > 0) {
+      return client.log[client.log.length - 1];
     } else if (engine.phase === C.Phase.WAIT) {
       if (engine.numSeated < engine.rules.numPlayers) {
         return "waiting for all players to be seated";
