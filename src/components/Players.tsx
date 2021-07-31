@@ -24,7 +24,7 @@ const PlayerInt = (props: {
       className={`playerInt ${props.active ? "active" : ""}`}
       ref={setOutRef}
     >
-      <span className="name">{props.name}</span>
+      <span className="playerName">{props.name}</span>
       {props.seatBtn}
       {props.askBtn}
       <div

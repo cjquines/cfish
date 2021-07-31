@@ -36,11 +36,13 @@ export class Info extends React.Component<Info.Props> {
             .filter((seat) => engine.teamOf(seat) === team)
             .map((seat) => (
               <li key={seat}>
-                {seat === engine.ownSeat ? (
-                  <b>{client.nameOf(seat)}</b>
-                ) : (
-                  client.nameOf(seat)
-                )}
+                <span className="playerName">
+                  {seat === engine.ownSeat ? (
+                    <b>{client.nameOf(seat)}</b>
+                  ) : (
+                    client.nameOf(seat)
+                  )}
+                </span>
               </li>
             ))}
         </ul>
@@ -64,7 +66,7 @@ export class Info extends React.Component<Info.Props> {
 
     return (
       <li key={user.id}>
-        {user.name}
+        <span className="playerName">{user.name}</span>
         {host ? " (host)" : ""}
         {client.identity.id === user.id ? (
           <button onClick={(e) => this.rename()}>rename</button>

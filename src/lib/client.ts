@@ -50,11 +50,13 @@ export class Client {
   }
 
   stringify(
-    key: "asker" | "askee" | "askedCard" | "declarer" | "declaredSuit"
+    key: "asker" | "askee" | "askedCard" | "declarer" | "declaredSuit" | "host"
   ): string {
     const obj = this.engine[key];
     if (key === "declaredSuit") {
       return fishSuitToString(this.engine[key]);
+    } else if (key === "host") {
+      return this.nameOf(this.engine[key]);
     } else if (typeof obj === "number") {
       const user = this.findUser(obj);
       return user?.id === this.identity?.id ? "you" : this.nameOf(obj);

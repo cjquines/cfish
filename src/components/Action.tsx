@@ -56,7 +56,10 @@ export class Action extends React.Component<Action.Props, Action.State> {
   renderText() {
     const { client } = this.props;
     const { engine } = client;
-    const sfy = (key) => client.stringify(key);
+    const sfy = (key) => {
+      const res = client.stringify(key);
+      return res.length > 12 ? res.slice(0, 10).concat("...") : res;
+    };
 
     if (engine.winner !== null && client.log.length > 0) {
       return client.log[client.log.length - 1];
@@ -67,7 +70,7 @@ export class Action extends React.Component<Action.Props, Action.State> {
       if (engine.identity === engine.host) {
         return "";
       }
-      return `waiting for ${client.nameOf(engine.host)} to start the game`;
+      return `waiting for ${sfy("host")} to start the game`;
     }
 
     if (client.log.length > 0) {

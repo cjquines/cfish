@@ -200,16 +200,17 @@ $rot: 90;
 .player {
   position: absolute;
 
-  .name {
-    display: inline-block;
-    max-width: 100%;
-    overflow-x: hidden;
-    text-overflow: ellipsis;
-  }
-
   &.shake {
     animation: shake 1s;
   }
+}
+
+.playerName {
+  display: inline-block;
+  line-height: 1em;
+  max-width: 10em;
+  overflow-x: clip;
+  text-overflow: ellipsis;
 }
 
 @keyframes shake {
