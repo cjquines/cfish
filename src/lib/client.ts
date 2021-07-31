@@ -179,8 +179,11 @@ export class Client {
             ? `${sfy("askee")} gave ${sfy("asker")} the ${sfy("askedCard")}`
             : `${sfy("askee")} did not have the ${sfy("askedCard")}`
         );
-        this.resetCardAnimHook?.();
-        this.resetShakeAnimHook?.();
+        if (event.response) {
+          this.resetCardAnimHook?.();
+        } else {
+          this.resetShakeAnimHook?.();
+        }
         break;
       case "initDeclare":
         this.engine.initDeclare(event.declarer, event.declaredSuit);
