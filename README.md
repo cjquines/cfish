@@ -5,9 +5,6 @@ web app for playing the card game [canadian fish, also known as literature](http
 ## wishlist
 
 - clean up css
-- restrict name length
-  - either in css by cutting off if too long
-  - or actually restricting name length
 - make action more legible
 - think about overall layout again
   - score in info panel should be moved

@@ -58,7 +58,7 @@ class Room extends React.Component<Room.Props, Room.State> {
     const name =
       window.localStorage.getItem("name") ??
       (window.prompt("enter your name") || "no name");
-    window.localStorage.setItem("name", name);
+    window.localStorage.setItem("name", name.slice(0, 16));
     return name;
   }
 

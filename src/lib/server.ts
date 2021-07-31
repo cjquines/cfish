@@ -66,7 +66,7 @@ export class Room {
   rename(user: P.User, name: string): void {
     const user_ = this.findUser(user.id);
     if (!assert(user_ !== null)) return;
-    user_.name = name;
+    user_.name = name.slice(0, 16);
 
     this.toAll("rename", user, name);
   }
@@ -238,7 +238,7 @@ export class Server {
   }
 
   join(id: UserID, room: RoomID, name: string): void {
-    const user: P.User = { id, name };
+    const user: P.User = { id, name: name.slice(0, 16) };
     if (this.rooms[room] === undefined) {
       this.rooms[room] = new Room(
         room,
