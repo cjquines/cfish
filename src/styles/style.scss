@@ -135,6 +135,10 @@ $rot: 90;
   grid-auto-flow: column;
   grid-template: repeat(5, auto) / 1fr 1fr;
 
+  p {
+    margin: 0;
+  }
+
   .score {
     font-size: 3rem;
     text-align: center;
