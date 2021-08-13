@@ -131,11 +131,9 @@ $rot: 90;
 }
 
 .teams {
-  display: flex;
-
-  .team {
-    width: 50%;
-  }
+  display: grid;
+  grid-auto-flow: column;
+  grid-template: repeat(5, auto) / 1fr 1fr;
 
   .score {
     font-size: 3rem;
