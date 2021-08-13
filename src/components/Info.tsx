@@ -30,6 +30,16 @@ export class Info extends React.Component<Info.Props> {
     return (
       <div className="team">
         <div className="score">{engine.scoreOf(team)}</div>
+        <p>suits:</p>
+        <ul>
+          {Card.FISH_SUITS.filter(
+            (suit) => engine.declarerOf[suit] === team
+          ).map((suit, i) => (
+            <li key={i}>
+              <SuitSpan suit={suit} />
+            </li>
+          ))}
+        </ul>
         <p>members:</p>
         <ul>
           {engine.seats
@@ -45,16 +55,6 @@ export class Info extends React.Component<Info.Props> {
                 </span>
               </li>
             ))}
-        </ul>
-        <p>suits:</p>
-        <ul>
-          {Card.FISH_SUITS.filter(
-            (suit) => engine.declarerOf[suit] === team
-          ).map((suit, i) => (
-            <li key={i}>
-              <SuitSpan suit={suit} />
-            </li>
-          ))}
         </ul>
       </div>
     );
