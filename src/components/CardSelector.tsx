@@ -56,6 +56,7 @@ export class CardSelector extends React.Component<CardSelector.Props> {
           <CardSelectorRow
             callback={callback}
             disabled={disabled}
+            key={fishSuitToString(suit)}
             suit={suit}
           />
         ))}

@@ -401,7 +401,7 @@ export class Engine extends Data {
     if (
       this.rules.declare === CFish.DeclareRule.DURING_TURN &&
       this.asker !== declarer &&
-      this.handSize[asker] !== 0
+      this.handSize[this.asker] !== 0
     )
       return new CFish.Error("declaring out of turn");
 

@@ -13,11 +13,13 @@ export class Client {
   status: "waiting" | "connected" | "disconnected" = "waiting";
   users: P.User[] = [];
 
+  cardAnimHook:
+    | ((asker: SeatID, askee: SeatID, askedCard: Card) => void)
+    | null = null;
   declareMoveHook:
     | ((srcId: string, srcIdx: number, destId: string, destIdx: number) => void)
     | null = null;
   onUpdate: ((state: this) => void) | null = null;
-  resetCardAnimHook: (() => void) | null = null;
   resetShakeAnimHook: (() => void) | null = null;
 
   constructor(readonly url: string, public room: RoomID, public name: string) {
@@ -182,7 +184,12 @@ export class Client {
             : `${sfy("askee")} did not have the ${sfy("askedCard")}`
         );
         if (event.response) {
-          this.resetCardAnimHook?.();
+          const { asker, askee, askedCard } = this.engine;
+          this.cardAnimHook?.(
+            asker,
+            askee,
+            new Card(askedCard.cardSuit, askedCard.rank)
+          );
         } else {
           this.resetShakeAnimHook?.();
         }
