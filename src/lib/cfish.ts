@@ -392,14 +392,16 @@ export class Engine extends Data {
     this.phase = CFish.Phase.ASK;
   }
 
-  // ASK -> DECLARE
+  // ASK / PASS -> DECLARE
   initDeclare(declarer: SeatID, declaredSuit: FishSuit): CFish.Result {
-    if (this.phase !== CFish.Phase.ASK) return new CFish.Error("bad phase");
+    if (this.phase !== CFish.Phase.ASK && this.phase !== CFish.Phase.PASS)
+      return new CFish.Error("bad phase");
     if (this.declarerOf[declaredSuit] !== undefined)
       return new CFish.Error("suit declared");
     if (
       this.rules.declare === CFish.DeclareRule.DURING_TURN &&
-      this.asker !== declarer
+      this.asker !== declarer &&
+      this.handSize[asker] !== 0
     )
       return new CFish.Error("declaring out of turn");
 
